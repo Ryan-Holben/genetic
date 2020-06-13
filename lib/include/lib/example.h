@@ -1,0 +1,2 @@
+
+int ExampleFunc(int input);
