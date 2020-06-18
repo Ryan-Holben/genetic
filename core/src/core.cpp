@@ -2,9 +2,7 @@
 
 namespace core {
 
-Number inline ActivationFunctionReLu(Number input) {
-    return input < 0.0 ? 0.0 : input;
-}
+Number inline ActivationFunctionReLu(Number input) { return input < 0.0 ? 0.0 : input; }
 
 // Apply the network to an input tuple, return the output tuple
 Tuple NeuralNetwork::compute(const Tuple& input) const {

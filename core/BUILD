@@ -5,7 +5,7 @@ cc_library(
     srcs = ["src/core.cpp"],
     hdrs = glob(["include/**/*.h"]),
     includes = ["include"],
-    visibility = ["//main:__pkg__"],
+    visibility = ["//datasets:__pkg__", "//main:__pkg__"],
 )
 
 cc_test (
