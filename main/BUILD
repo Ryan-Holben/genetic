@@ -4,7 +4,7 @@ cc_binary(
     name = "main",
     srcs = ["main.cpp"],
     deps = [
-        # ":hello-greet",
+        "//core:core",
         "//lib:example",
     ],
 )
