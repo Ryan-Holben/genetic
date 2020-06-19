@@ -9,7 +9,6 @@ using Datum = std::pair<Tuple, Tuple>;
 using Dataset = std::vector<Datum>;
 
 struct Neuron {
-    // std::vector<Number> weights;
     Tuple weights;
     Number bias;
 };
@@ -21,8 +20,8 @@ class NeuralNetwork {
     // Primary methods
     Tuple compute(const Tuple& input) const;
 
-    // Utilities
-    void buildOnesNetwork(const std::vector<size_t>& layerSizes);
+    // Utils.  See net_utils.h/.cpp
+    friend NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes);
 
     // Topology
     size_t getWidth() const;
@@ -33,6 +32,8 @@ class NeuralNetwork {
   private:
     std::vector<Layer> _layers;
 };
+
+NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes);
 
 Number inline ActivationFunctionReLu(Number input);
 

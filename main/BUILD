@@ -6,5 +6,6 @@ cc_binary(
     deps = [
         "//core:core",
         "//datasets:xor",
+        "//evo:evo",
     ],
 )

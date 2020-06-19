@@ -1,24 +1,21 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "core",
+    name = "evo",
     srcs = glob(["src/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     includes = ["include"],
-    visibility = [
-        "//datasets:__pkg__",
-        "//evo:__pkg__",
-        "//main:__pkg__",
-    ],
+    visibility = ["//main:__pkg__"],
+    deps = ["//core:core"],
 )
 
 cc_test (
-    name = "neural-network-core",
+    name = "test-evo",
     srcs = [
         "test/unit-tests.cpp",
     ],
     deps = [
-        ":core",
+        ":evo",
         "@gtest//:gtest",
         "@gtest//:gtest_main", # Only if hello_test.cc has no main()
     ],

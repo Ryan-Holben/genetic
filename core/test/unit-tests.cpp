@@ -6,20 +6,19 @@ using namespace testing;
 using namespace core;
 
 TEST(NeuralNetwork, topology) {
-    NeuralNetwork net;
-    net.buildOnesNetwork({2, 3, 4, 1});
+    NeuralNetwork net = BuildOnesNetwork({2, 3, 4, 1});
     EXPECT_EQ(net.getWidth(), 4);
     EXPECT_EQ(net.getDepth(), 4);
     EXPECT_EQ(net.getNumNeurons(), 10);
     EXPECT_EQ(net.getNumConnections(), 22);
 
-    net.buildOnesNetwork({1, 1, 1, 1, 1, 1});
+    net = BuildOnesNetwork({1, 1, 1, 1, 1, 1});
     EXPECT_EQ(net.getWidth(), 1);
     EXPECT_EQ(net.getDepth(), 6);
     EXPECT_EQ(net.getNumNeurons(), 6);
     EXPECT_EQ(net.getNumConnections(), 5);
 
-    net.buildOnesNetwork({10});
+    net = BuildOnesNetwork({10});
     EXPECT_EQ(net.getWidth(), 10);
     EXPECT_EQ(net.getDepth(), 1);
     EXPECT_EQ(net.getNumNeurons(), 10);
@@ -27,8 +26,7 @@ TEST(NeuralNetwork, topology) {
 }
 
 TEST(NeuralNetwork, computeBasic) {
-    NeuralNetwork net;
-    net.buildOnesNetwork({2, 3, 10, 2});
+    NeuralNetwork net = BuildOnesNetwork({2, 3, 10, 2});
 
     EXPECT_THAT(net.compute({0, 0}), ElementsAre(41, 41));
     EXPECT_THAT(net.compute({1, 0}), ElementsAre(71, 71));
@@ -38,7 +36,7 @@ TEST(NeuralNetwork, computeBasic) {
     EXPECT_THAT(net.compute({-1, 0}), ElementsAre(11, 11));
     EXPECT_THAT(net.compute({0, -1}), ElementsAre(11, 11));
 
-    net.buildOnesNetwork({1, 1000, 1000, 1000, 1000, 1});
+    net = BuildOnesNetwork({1, 1000, 1000, 1000, 1000, 1});
     net.compute({0.5});
 }
 
