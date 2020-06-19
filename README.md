@@ -32,3 +32,8 @@ Build plastic neural networks by optimizing their structure and connections simu
         * DoMutations()
     * Generation: encapsulates a generation's set of agents, plus stats about them
     * Evolver: contains/runs the main evolution algorithm
+
+# Architecture
+
+
+![](architecture.gz.png)
