@@ -1,4 +1,4 @@
-#include <core/core.h>
+#include <core/neural_network.h>
 
 namespace core {
 
@@ -17,4 +17,4 @@ NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes) {
     return net;
 }
 
-} //namespace core
+} // namespace core

@@ -4,6 +4,8 @@ Build plastic neural networks by optimizing their structure and connections simu
 
 
 ## Useful links for development
+* [Useful preprocessor macros](https://gcc.gnu.org/onlinedocs/cpp/Macros.html)
+* [Unix Signals](http://people.cs.pitt.edu/~alanjawi/cs449/code/shell/UnixSignals.htm)
 * [Common C++ Bazel BUILD patterns](https://docs.bazel.build/versions/master/cpp-use-cases.html)
 * [Googletest](https://github.com/google/googletest)
 * [Google benchmark](https://github.com/google/benchmark)

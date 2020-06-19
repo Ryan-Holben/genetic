@@ -1,4 +1,5 @@
 #include <core/core.h>
+// #include <core/platform.h>
 #include <datasets/xor.h>
 #include <evo/evo.h>
 
@@ -7,6 +8,8 @@
 // using namespace core;
 
 int main(int argc, char** argv) {
+    core::InstallBacktraceHandler();
+
     evo::Evolver evo;
     evo.installTrainingData(BuildXorDataset());
     evo.runAlgorithm(10, 3, 0.5, {2, 3, 5, 1});

@@ -4,8 +4,9 @@ cc_binary(
     name = "main",
     srcs = ["main.cpp"],
     deps = [
-        "//core:core",
+        "//core",
         "//datasets:xor",
-        "//evo:evo",
+        "//evo",
     ],
+    # copts = ["-g -O0"],
 )

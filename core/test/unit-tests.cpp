@@ -1,4 +1,5 @@
-#include "core/core.h"
+#include "core/math.h"
+#include "core/neural_network.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
