@@ -31,18 +31,20 @@ void InstallBacktraceHandler();
 void Borktrace(int sig = -1, size_t level = 0, const char* file = "", int line = -1,
                const char* function = "");
 
-#define ASSERT_WITH_MSG(conditional, message)                                                      \
-    if (conditional) {                                                                             \
+// Asserts that conditional is true, exits with debugging info otherwise.
+#define ASSERT(conditional)                                                                        \
+    if (!(conditional)) {                                                                          \
         std::cout << COL_RED_BOLD << "ASSERT FAILED:" << COL_NONE << " ";                          \
-        std::cout << COL_PINK_BOLD << #conditional << COL_NONE << "\n";                            \
-        std::cout << "\t" << COL_RED << "Message:\t" << COL_NONE << message;                       \
+        std::cout << COL_PINK_BOLD << #conditional << COL_NONE;                                    \
         Borktrace(SIGINT, 3, __FILE__, __LINE__, __PRETTY_FUNCTION__);                             \
     }
 
-#define ASSERT(conditional)                                                                        \
-    if (conditional) {                                                                             \
+// Asserts that conditional is true, exits with debugging info and the supplied message otherwise.
+#define ASSERT_WITH_MSG(conditional, message)                                                      \
+    if (!(conditional)) {                                                                          \
         std::cout << COL_RED_BOLD << "ASSERT FAILED:" << COL_NONE << " ";                          \
-        std::cout << COL_PINK_BOLD << #conditional << COL_NONE;                                    \
+        std::cout << COL_PINK_BOLD << #conditional << COL_NONE << "\n";                            \
+        std::cout << "\t" << COL_RED << "Message:\t" << COL_NONE << message;                       \
         Borktrace(SIGINT, 3, __FILE__, __LINE__, __PRETTY_FUNCTION__);                             \
     }
 

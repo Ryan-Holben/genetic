@@ -10,7 +10,7 @@ struct Agent {
     NeuralNetwork brain;
     Number score = std::numeric_limits<Number>::infinity();
 
-    // Agent() {}
+    Agent() {}
     Agent(NeuralNetwork&& brain) : brain(brain) {}
 };
 

@@ -67,7 +67,7 @@ void Borktrace(int sig, size_t level, const char* file, int line, const char* fu
     stackTrace.load_here();
     resolver.load_stacktrace(stackTrace);
 
-    std::cout << "----- " << COL_YELLOW << "Stacktrace" << COL_NONE << " -----\n";
+    std::cout << "------------ " << COL_YELLOW << "top of stack" << COL_NONE << " ------------\n";
     size_t i = 0;
     for (; i < level; i++) {
         const ResolvedTrace trace = resolver.resolve(stackTrace[i]);
@@ -75,7 +75,7 @@ void Borktrace(int sig, size_t level, const char* file, int line, const char* fu
                   << trace.object_function << COL_NONE << ")\n";
     }
     if (level > 0) {
-        std::cout << "----- " << COL_YELLOW << "Traceback and exit starts here" << COL_NONE
+        std::cout << "----- " << COL_YELLOW << "stacktrace was called here" << COL_NONE
                   << " -----\n";
     }
     for (; i < stackTrace.size(); i++) {
@@ -83,11 +83,11 @@ void Borktrace(int sig, size_t level, const char* file, int line, const char* fu
         std::cout << " " << COL_GREEN_BOLD << i << COL_NONE << " - " << COL_BLUE
                   << trace.object_function << COL_NONE << "\n";
     }
-    std::cout << "----- " << COL_YELLOW << "end stacktrace" << COL_NONE << " -----\n";
+    std::cout << "----------- " << COL_YELLOW << "end stacktrace" << COL_NONE << " -----------\n";
     exit(1);
 }
 
-void BacktraceHandler(int sig) { Borktrace(sig); }
+void BacktraceHandler(int sig) { Borktrace(sig, 4); }
 
 void InstallBacktraceHandler() {
     for (size_t i = 0; i < NSIG; i++) {

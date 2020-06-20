@@ -19,16 +19,16 @@ class Evolver {
     void installTrainingData(Dataset&& dataset);
 
   private:
-    // Auxilary functions called exclusively by runAlgorithm()
-    friend void RunAndScoreGeneration(Dataset& dataset, Generation* gen);
-    friend void SortGenerationByScores(Generation* gen);
+    void RecordGenerationToHistory(Generation& gen);
 
     Dataset _trainingData;
     std::vector<Generation> _generations;
 };
 
-// Gotta re-declare friend functions in C++
+// Auxilary functions called exclusively by runAlgorithm()
 void RunAndScoreGeneration(Dataset& dataset, Generation* gen);
 void SortGenerationByScores(Generation* gen);
+void KeepOnlyFirstAgents(const size_t numToKeep, Generation* gen);
+void ComputeGenerationStats(Generation* gen);
 
 } // namespace evo
