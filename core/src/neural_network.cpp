@@ -1,11 +1,11 @@
 #include <core/math.h>
 #include <core/neural_network.h>
+#include <core/platform.h>
 
 namespace core {
 
 // Apply the network to an input tuple, return the output tuple
 Tuple NeuralNetwork::compute(const Tuple& input) const {
-
     const size_t width = getWidth();
 
     Tuple prev, cur;
@@ -44,6 +44,7 @@ Tuple NeuralNetwork::compute(const Tuple& input) const {
 // TODO: Maybe cache this value in the future
 // Returns the maximum length of all layers
 size_t NeuralNetwork::getWidth() const {
+    ASSERT(!_layers.empty());
     return std::max_element(_layers.begin(), _layers.end(),
                             [](const Layer& a, const Layer& b) { return a.size() < b.size(); })
         ->size();

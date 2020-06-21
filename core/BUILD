@@ -9,6 +9,7 @@ cc_library(
         ":math",
         ":neural_network",
         ":platform",
+        ":random",
         ":types",
     ],
     visibility = [
@@ -36,6 +37,8 @@ cc_library(
     includes = ["include"],
     deps = [
         ":math",
+        ":platform",
+        ":random",
         ":types",
     ],
 )
@@ -44,6 +47,17 @@ cc_library(
     name = "math",
     srcs = ["src/math.cpp"],
     hdrs = ["include/core/math.h"],
+    includes = ["include"],
+    deps = [
+        ":platform",
+        ":types",
+    ],
+)
+
+cc_library(
+    name = "random",
+    srcs = ["src/random.cpp"],
+    hdrs = ["include/core/random.h"],
     includes = ["include"],
     deps = [
         ":types",
@@ -61,12 +75,24 @@ cc_library(
 )
 
 cc_test (
-    name = "neural-network-core",
+    name = "test-neural-network",
     srcs = [
         "test/unit-tests.cpp",
     ],
     deps = [
         ":core",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main", # Only if hello_test.cc has no main()
+    ],
+)
+
+cc_test (
+    name = "test-random",
+    srcs = [
+        "test/test-random.cpp",
+    ],
+    deps = [
+        ":random",
         "@gtest//:gtest",
         "@gtest//:gtest_main", # Only if hello_test.cc has no main()
     ],

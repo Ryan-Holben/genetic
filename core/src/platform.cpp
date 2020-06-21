@@ -1,14 +1,8 @@
 #include <core/platform.h>
 
-#include <iostream>
-
 // #include <execinfo.h>  // for backtrace
 // #include <dlfcn.h>     // for dladdr
 // #include <cxxabi.h>    // for __cxa_demangle
-
-#include <backward-cpp/backward.hpp>
-#include <string.h>
-using namespace backward;
 
 namespace core {
 
@@ -52,7 +46,49 @@ namespace core {
 // 	// return trace_buf.str();
 // }
 
-#define TO_STR(x) #x
+std::string formatFunctionString(const std::string& in) {
+    std::string result;
+    const auto plus = in.find("+");
+    const auto back = in.find(")");
+    if (back == std::string::npos) {
+        result = COL_RED_BOLD + in.substr(0, plus) + COL_NONE;
+        result += "+";
+        result += COL_PINK + in.substr(plus + 1, in.size() - plus - 1) + COL_NONE;
+        return result;
+    }
+
+    const auto front = in.find("(");
+    int funcStart = front;
+    size_t brackets = 0;
+    for (; funcStart >= -1; funcStart--) {
+        if (in[funcStart] == '>') {
+            brackets++;
+        } else if (brackets > 0 && in[funcStart] == '<') {
+            brackets--;
+        }
+        if (brackets == 0 && in[funcStart] == ':') {
+            break;
+        }
+    }
+    if (funcStart < 0) {
+        funcStart = 0;
+    } else {
+        funcStart++;
+    }
+
+    // From start to the last place where we hit space or see ::, but is outside of <brackets>
+    result = in.substr(0, funcStart);
+    // Continue through the first paren
+    result += COL_RED + in.substr(funcStart, front - funcStart + 1);
+    // Inside parens
+    result += COL_GREEN + in.substr(front + 1, back - front - 1) + COL_RED;
+    // Last paren and rest of signature
+    result += ")";
+    result += COL_NONE + in.substr(back + 1, plus - back);
+    result += COL_PINK + in.substr(plus + 1, in.size() - plus - 1) + COL_NONE;
+
+    return result;
+}
 
 void Borktrace(int sig, size_t level, const char* file, int line, const char* function) {
     std::cout << "\n";
@@ -62,26 +98,26 @@ void Borktrace(int sig, size_t level, const char* file, int line, const char* fu
     std::cout << COL_RED << "\tLine #:\t\t" << COL_NONE << line << "\n";
     std::cout << "\n";
 
-    StackTrace stackTrace;
-    TraceResolver resolver;
+    backward::StackTrace stackTrace;
+    backward::TraceResolver resolver;
     stackTrace.load_here();
     resolver.load_stacktrace(stackTrace);
 
     std::cout << "------------ " << COL_YELLOW << "top of stack" << COL_NONE << " ------------\n";
     size_t i = 0;
     for (; i < level; i++) {
-        const ResolvedTrace trace = resolver.resolve(stackTrace[i]);
-        std::cout << "(" << COL_GREEN_BOLD << i << COL_NONE << " - " << COL_BLUE
-                  << trace.object_function << COL_NONE << ")\n";
+        const backward::ResolvedTrace trace = resolver.resolve(stackTrace[i]);
+        std::cout << COL_GREEN_BOLD << i << COL_NONE << " - "
+                  << formatFunctionString(trace.object_function) << "\n";
     }
     if (level > 0) {
         std::cout << "----- " << COL_YELLOW << "stacktrace was called here" << COL_NONE
                   << " -----\n";
     }
     for (; i < stackTrace.size(); i++) {
-        const ResolvedTrace trace = resolver.resolve(stackTrace[i]);
-        std::cout << " " << COL_GREEN_BOLD << i << COL_NONE << " - " << COL_BLUE
-                  << trace.object_function << COL_NONE << "\n";
+        const backward::ResolvedTrace trace = resolver.resolve(stackTrace[i]);
+        std::cout << COL_GREEN_BOLD << i << COL_NONE << " - "
+                  << formatFunctionString(trace.object_function) << "\n";
     }
     std::cout << "----------- " << COL_YELLOW << "end stacktrace" << COL_NONE << " -----------\n";
     exit(1);

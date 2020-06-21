@@ -1,14 +1,5 @@
 #pragma once
 
-#include <assert.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <stdexcept>
-
 #include <backward-cpp/backward.hpp>
 using namespace backward;
 

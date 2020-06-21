@@ -6,7 +6,7 @@
 using namespace testing;
 using namespace core;
 
-TEST(NeuralNetwork, topology) {
+TEST(NeuralNetwork, topologyOnesNetwork) {
     NeuralNetwork net = BuildOnesNetwork({2, 3, 4, 1});
     EXPECT_EQ(net.getWidth(), 4);
     EXPECT_EQ(net.getDepth(), 4);
@@ -26,7 +26,27 @@ TEST(NeuralNetwork, topology) {
     EXPECT_EQ(net.getNumConnections(), 0);
 }
 
-TEST(NeuralNetwork, computeBasic) {
+TEST(NeuralNetwork, topologyRandomNetwork) {
+    NeuralNetwork net = BuildRandomNetwork({2, 3, 4, 1});
+    EXPECT_EQ(net.getWidth(), 4);
+    EXPECT_EQ(net.getDepth(), 4);
+    EXPECT_EQ(net.getNumNeurons(), 10);
+    EXPECT_EQ(net.getNumConnections(), 22);
+
+    net = BuildRandomNetwork({1, 1, 1, 1, 1, 1});
+    EXPECT_EQ(net.getWidth(), 1);
+    EXPECT_EQ(net.getDepth(), 6);
+    EXPECT_EQ(net.getNumNeurons(), 6);
+    EXPECT_EQ(net.getNumConnections(), 5);
+
+    net = BuildRandomNetwork({10});
+    EXPECT_EQ(net.getWidth(), 10);
+    EXPECT_EQ(net.getDepth(), 1);
+    EXPECT_EQ(net.getNumNeurons(), 10);
+    EXPECT_EQ(net.getNumConnections(), 0);
+}
+
+TEST(NeuralNetwork, computeBasicOnesNetwork) {
     NeuralNetwork net = BuildOnesNetwork({2, 3, 10, 2});
 
     EXPECT_THAT(net.compute({0, 0}), ElementsAre(41, 41));
