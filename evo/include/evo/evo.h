@@ -30,5 +30,8 @@ void RunAndScoreGeneration(Dataset& dataset, Generation* gen);
 void SortGenerationByScores(Generation* gen);
 void KeepOnlyFirstAgents(const size_t numToKeep, Generation* gen);
 void ComputeGenerationStats(Generation* gen);
+Generation SpawnNextGeneration(const Generation& gen);
+
+size_t GetNumChildren(Number score, Number minScore, Number maxScore);
 
 } // namespace evo

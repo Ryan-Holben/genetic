@@ -71,4 +71,67 @@ size_t NeuralNetwork::getNumConnections() const {
     return num;
 }
 
+void NeuralNetwork::AddRandomNeuron() {
+    // We can't modify the first or last layer, as they define the input & output
+    IndexSelector.setDist(1, getDepth() - 2);
+    size_t layerIdx = IndexSelector.get();
+
+    // We place the neuron at the back of this layer, because it's fully connected to its adjacent
+    // layers anyway, so order doesn't matter.
+    Neuron node;
+    node.bias = RandomBias.get();
+    node.weights.reserve(_layers[layerIdx + 1].size());
+    std::generate_n(std::back_inserter(node.weights), _layers[layerIdx + 1].size(),
+                    []() { return RandomWeight.get(); });
+    _layers[layerIdx].push_back(node);
+
+    // Then we add connections to this neuron from each neuron in the previous layer
+    for (size_t i = 0; i < _layers[layerIdx - 1].size(); i++) {
+        _layers[layerIdx - 1][i].weights.push_back(RandomWeight.get());
+    }
+}
+
+void NeuralNetwork::AddRandomLayer() {
+    // Places the new layer at position layerIdx, pushing the data there back.
+    // Ex: If we insert at index 1, [a, b, c, d] becomes [a, NEW, b, c, d]
+    IndexSelector.setDist(1, getDepth() - 1);
+    size_t layerIdx = IndexSelector.get();
+
+    Layer newLayer = _layers[layerIdx - 1];
+    const size_t layerSize = newLayer.size();
+    for (size_t i = 0; i < _layers[layerIdx - 1].size(); i++) {
+        _layers[layerIdx - 1][i].bias = 0.0;
+        _layers[layerIdx - 1][i].weights = Tuple(layerSize, 0.0);
+        _layers[layerIdx - 1][i].weights[i] = 1.0;
+    }
+    _layers.insert(_layers.begin() + layerIdx - 1, newLayer);
+}
+
+void NeuralNetwork::MutateBiasesAndWeights(size_t* numBiasMutations, size_t* numWeightMutations) {
+    OUTPUT_PARAM(numBiasMutations);
+    OUTPUT_PARAM(numWeightMutations);
+
+    // Actually let's not clear this, and let the parent function accumulate over multiple calls
+    // *numBiasMutations = 0;
+    // *numWeightMutations = 0;
+
+    for (auto& layer : _layers) {
+        for (auto& neuron : layer) {
+            if (ChanceOfBiasMutation.roll()) {
+                neuron.bias += AmountOfBiasMutation.get();
+                (*numBiasMutations)++;
+            }
+            for (auto& weight : neuron.weights) {
+                if (ChanceOfWeightMutation.roll()) {
+                    weight += AmountOfWeightMutation.get();
+                    (*numWeightMutations)++;
+                }
+            }
+        }
+    }
+
+    // std::cout << "Mutated " << numBiasMutations << " biases and " << numWeightMutations << "
+    // weights.\n";
+}
+
 } // namespace core

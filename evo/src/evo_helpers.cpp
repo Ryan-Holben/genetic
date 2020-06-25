@@ -1,3 +1,4 @@
+#include <evo/constants.h>
 #include <evo/evo.h>
 
 namespace evo {
@@ -23,11 +24,14 @@ void SortGenerationByScores(Generation* gen) {
     const size_t startSize = gen->agents.size();
 
     std::sort(gen->agents.begin(), gen->agents.end(),
-              [](Agent& a, Agent& b) { return a.score > b.score; });
+              [](Agent& a, Agent& b) { return a.score < b.score; });
 
     ASSERT_WITH_MSG(startSize == gen->agents.size(), "Sorting changed the number of agents from "
                                                          << startSize << " to "
                                                          << gen->agents.size());
+    ASSERT_WITH_MSG(gen->agents.front().score <= gen->agents.back().score,
+                    "Failed to order agents by score.  Front is "
+                        << gen->agents.front().score << ", back is " << gen->agents.back().score);
 }
 
 // Culls any agents beyond the first numToKeep agents.
@@ -40,15 +44,19 @@ void KeepOnlyFirstAgents(const size_t numToKeep, Generation* gen) {
         gen->agents.resize(numToKeep);
     }
 
-    ASSERT_WITH_MSG(startCapacity == gen->agents.capacity(),
-                    "Capacity changed from " << startCapacity << " to " << gen->agents.capacity())
+    const size_t endCapacity = gen->agents.capacity();
+    const size_t endSize = gen->agents.size();
+    gen->numCulled = startSize - endSize;
+
+    ASSERT_WITH_MSG(startCapacity == endCapacity,
+                    "Capacity changed from " << startCapacity << " to " << endCapacity)
     if (startSize <= numToKeep) {
         ASSERT_WITH_MSG(
-            startSize == gen->agents.size(),
+            startSize == endSize,
             "We resized when we were already under numToKeep and should have done nothing; from "
-                << startSize << " to " << gen->agents.size());
+                << startSize << " to " << endSize);
     } else {
-        ASSERT_WITH_MSG(startSize > gen->agents.size(), "We needed to resize but didn't")
+        ASSERT_WITH_MSG(startSize > endSize, "We needed to resize but didn't")
     }
 }
 
@@ -72,6 +80,79 @@ void ComputeGenerationStats(Generation* gen) {
         gen->averageScore += agent.score;
     }
     gen->averageScore /= gen->agents.size();
+}
+
+// Create a new generation from the last one.  In doing so we introduce random mutations.
+Generation SpawnNextGeneration(const Generation& lastGen) {
+    Generation newGen;
+
+    // TODO: Do something about constants::flags::PARENTS_DIE_EACH_GENERATION
+    if (!constants::flags::PARENTS_DIE_EACH_GENERATION) {
+        newGen.agents.insert(newGen.agents.begin(), lastGen.agents.begin(), lastGen.agents.end());
+    }
+
+    size_t numNewNeurons = 0;
+    size_t numNewLayers = 0;
+    size_t numBiasMutations = 0;
+    size_t numWeightMutations = 0;
+
+    for (auto agent : lastGen.agents) {
+        // 1. Get number of children for the agent
+        const size_t numChildren =
+            GetNumChildren(agent.score, lastGen.bestScore, lastGen.worstScore);
+
+        // 2. Loop through that number; to each, generation a child with mutations
+        for (size_t i = 0; i < numChildren; i++) {
+            // 2-a. Copy the child
+            auto child = agent;
+
+            // 2-b. Mutate the child
+            // Add a new neuron?
+            if (constants::mutation::chance::NewNeuron.roll()) {
+                agent.brain.AddRandomNeuron();
+                numNewNeurons++;
+            }
+
+            // Add a new neuron?
+            if (constants::mutation::chance::NewLayer.roll()) {
+                agent.brain.AddRandomLayer();
+                numNewLayers++;
+            }
+
+            // Mutate weights and biases
+            agent.brain.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
+
+            // 2-c. Push the child to the output
+            newGen.agents.push_back(child);
+        }
+        newGen.numChildren += numChildren;
+    }
+    std::cout << "Added " << numNewNeurons << " neurons.\n";
+    std::cout << "Added " << numNewLayers << " layers.\n";
+    std::cout << "Mutated " << numBiasMutations << " biases and " << numWeightMutations
+              << " weights.\n";
+
+    return newGen;
+}
+
+// Given an input score for an agent, and the min and max score defining its generation, return the
+// number of children we should spawn.  Don't forget that minScore and maxScore correspond with the
+// best and worst scores, respectively!
+
+// TODO: For a fixed generation all of these calculations are fixed.  So precompute it once for a
+// minor perf boost.
+size_t GetNumChildren(Number score, Number minScore, Number maxScore) {
+    ASSERT_WITH_MSG(minScore <= score && score <= maxScore,
+                    "Score values don't make sense.  minScore = "
+                        << minScore << ", score = " << score << ", maxScore = " << maxScore);
+    if (minScore == maxScore) {
+        return constants::population::MAX_NUM_CHILDREN;
+    } else {
+        const double ratio = (score - minScore) / (maxScore - minScore);
+        // Remember to subtract the ratio from 1.0, because a low ratio of 0.0 is best, and a high
+        // ratio of 1.0 is worst.
+        return (1.0 - ratio) * constants::population::MAX_NUM_CHILDREN;
+    }
 }
 
 } // namespace evo

@@ -12,7 +12,10 @@ int main(int argc, char** argv) {
 
     evo::Evolver evo;
     evo.installTrainingData(BuildXorDataset());
-    evo.runAlgorithm(10, 3, 0.5, {2, 3, 5, 1});
+    evo.runAlgorithm(/* initialPopulation = */ 10,
+                     /* maxGenerations = */ 50,
+                     /* targetScore = */ 0.01,
+                     /* defaultTopology = */ {2, 3, 5, 1});
 
     // core::NeuralNetwork net;
     // net.buildOnesNetwork({2, 3, 19, 1});

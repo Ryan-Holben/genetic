@@ -83,7 +83,7 @@ def main():
         subprocess.run("open architecture.gz.png", shell=True)
         
     else:
-        print("Invocation:\n\t./bazel-graph.py [packagename]")
+        print("Invocation:\n\t./graph-bazel-graph.py [packagename]")
     
 
 if __name__ == "__main__":

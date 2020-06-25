@@ -60,6 +60,7 @@ cc_library(
     hdrs = ["include/core/random.h"],
     includes = ["include"],
     deps = [
+        ":platform",
         ":types",
     ],
 )

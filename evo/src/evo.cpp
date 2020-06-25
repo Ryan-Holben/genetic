@@ -18,7 +18,7 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
     // Instantiate the first generation.
     Generation currentGen;
     currentGen.GenerateOnesNetworks(initialPopulation, defaultTopology);
-    std::cout << "Built " << currentGen.agents.size() << " agents.\n";
+    std::cout << "Seeded population pool with " << currentGen.agents.size() << " agents.\n";
 
     // Run through generations, reproducing, evolving, and culling agents until one meets the target
     // fitness score.
@@ -39,33 +39,49 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         SortGenerationByScores(&currentGen);
 
         // Cull the worst-scoring agents if they exceed our population max size
-        KeepOnlyFirstAgents(constants::MAX_NUM_AGENTS, &currentGen);
+        KeepOnlyFirstAgents(constants::population::MAX_NUM_AGENTS, &currentGen);
+        std::cout << "Culled " << currentGen.numCulled << " agents, population is "
+                  << currentGen.agents.size() << ".\n";
 
         // Record stats about the best and worst scorers.
         ComputeGenerationStats(&currentGen);
+        std::cout << "\x1b[1;33mScore range: " << currentGen.bestScore << ", "
+                  << currentGen.worstScore << "\x1b[0m\n";
 
-        // Save the current gen to the annals of history.
+        // MOVE the current gen to the annals of history.
+        // CRITICAL NOTES:
+        // * Philosophically, at this point the current generation has stopped changing, and it has
+        //      been saved to history.
+        // * Until SpawnNExtGeneration, there is no currentGen, and accessing that variable gives
+        //      undefined behavior.  Instead, we refer to lastGen in the interim.
         RecordGenerationToHistory(currentGen);
+        const auto& lastGen = _generations.back();
 
         // If we're on the final generation, or if we've reached our target, terminate early instead
         // of producing a new gen.
-        if (currentGen.bestScore <= targetScore) {
+        if (lastGen.bestScore <= targetScore) {
             std::cout << "\n\x1b[1;31mFinished!\x1b[0m\n";
-            std::cout << "Exceeded target score of " << targetScore << " with a final score of "
-                      << currentGen.bestScore << " after " << generationIdx << " generations.\n";
+            std::cout << "Beat target score of " << targetScore << " with a final score of "
+                      << lastGen.bestScore << " after " << generationIdx << " generations.\n";
             break;
         } else if (generationIdx >= maxGenerations) {
             std::cout << "\n\x1b[1;31mFinished!\x1b[0m\n";
             std::cout << "Reached final generation " << maxGenerations
                       << " without reaching target score of " << targetScore
-                      << ". Final best score was " << currentGen.bestScore << ".\n";
+                      << ". Final best score was " << lastGen.bestScore << ".\n";
             break;
         }
 
-        // Let this gen reproduce.  In doing so, the children will be mutations of their parents.
+        // Let the generation reproduce and create the next generation, introducing random
+        // mutations.  This operation will be done in-place on `currentGen`, since we already saved
+        // a copy of the previous generation.
+        currentGen = SpawnNextGeneration(lastGen);
+        std::cout << "Spawned " << currentGen.numChildren << " children, population is "
+                  << currentGen.agents.size() << ".\n";
     }
 }
 
-void Evolver::RecordGenerationToHistory(Generation& gen) { _generations.push_back(gen); }
+// Makes a COPY of the provided generation
+void Evolver::RecordGenerationToHistory(Generation& gen) { _generations.push_back(std::move(gen)); }
 
 } // namespace evo
