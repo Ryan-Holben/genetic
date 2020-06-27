@@ -1,10 +1,11 @@
-#include "core/math.h"
-#include "core/neural_network.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <core/math.h>
+#include <net/neural_network.h>
 
 using namespace testing;
 using namespace core;
+using namespace net;
 
 TEST(NeuralNetwork, topologyOnesNetwork) {
     NeuralNetwork net = BuildOnesNetwork({2, 3, 4, 1});

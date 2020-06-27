@@ -39,7 +39,7 @@ struct Generation {
         agents.clear();
         for (size_t i = 0; i < numAgents; i++) {
             // agents.push_back(Agent(BuildOnesNetwork(defaultTopology)));
-            agents.push_back(Agent(BuildRandomNetwork(defaultTopology)));
+            agents.push_back(Agent(net::BuildRandomNetwork(defaultTopology)));
         }
     }
 };

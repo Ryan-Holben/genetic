@@ -1,8 +1,8 @@
 #include <core/math.h>
-#include <core/neural_network.h>
 #include <core/platform.h>
+#include <net/neural_network.h>
 
-namespace core {
+namespace net {
 
 // Apply the network to an input tuple, return the output tuple
 Tuple NeuralNetwork::compute(const Tuple& input) const {
@@ -134,4 +134,4 @@ void NeuralNetwork::MutateBiasesAndWeights(size_t* numBiasMutations, size_t* num
     // weights.\n";
 }
 
-} // namespace core
+} // namespace net

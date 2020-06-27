@@ -1,10 +1,11 @@
 #pragma once
 
-#include "types.h"
+#include <core/random.h>
+#include <core/types.h>
 
-#include "random.h"
+using namespace core;
 
-namespace core {
+namespace net {
 
 static RandIntDistribution IndexSelector(0, 10); // Used for choosing indices in vectors
 
@@ -50,4 +51,4 @@ class NeuralNetwork {
 NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes);
 NeuralNetwork BuildRandomNetwork(const std::vector<size_t>& layerSizes);
 
-} // namespace core
+} // namespace net

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <core/math.h>
-#include <core/neural_network.h>
 #include <core/platform.h>
 #include <evo/generation.h>
+#include <net/neural_network.h>
 
 #include <vector>
 

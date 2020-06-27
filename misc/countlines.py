@@ -1,8 +1,10 @@
+#!/usr/bin/env python2
+ 
 import os
 from collections import Counter
 
 def main():
-    folders = "core datasets evo main".split()
+    folders = "core datasets evo main misc".split()
     filters = "BUILD WORKSPACE cpp h cc hpp c py".split()
     filecount = Counter()
     linecount = Counter()

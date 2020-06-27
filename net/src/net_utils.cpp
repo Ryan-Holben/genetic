@@ -1,9 +1,9 @@
-#include <core/neural_network.h>
 #include <core/platform.h>
+#include <net/neural_network.h>
 
 #include <algorithm>
 
-namespace core {
+namespace net {
 
 // Build a network with the provided layer sizes, where all weights and biases are set to 1.0.
 // Useful for testing purposes or cheaply initializing a blank network that can still propagate
@@ -43,4 +43,4 @@ NeuralNetwork BuildRandomNetwork(const std::vector<size_t>& layerSizes) {
     return net;
 }
 
-} // namespace core
+} // namespace net
