@@ -20,3 +20,9 @@ cc_test (
         "@gtest//:gtest_main", # Only if hello_test.cc has no main()
     ],
 )
+
+cc_binary(
+    name = "benchmark",
+    srcs = ["bench/bench-net.cpp"],
+    deps = [":net", "//bench:benchlib"],
+)
