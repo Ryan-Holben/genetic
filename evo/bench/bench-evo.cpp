@@ -1,26 +1,89 @@
 #include <bench/benc.h>
+
+#include <core/random.h>
+#include <evo/evo.h>
+
 #include <iostream>
 
-#include <evo/evo.h>
+void KeepOnlyFirstAgents(const size_t numToKeep, evo::Generation& gen) {
+    evo::KeepOnlyFirstAgents(numToKeep, &gen);
+}
+
+void SortGenerationByScores(evo::Generation& gen) { evo::SortGenerationByScores(&gen); }
 
 int main() {
     DECLARE_BENCHMARK_SET(evoBench);
-    DECLARE_BENCHMARK_SET(getNumChildren);
 
-    ADD_BENCH(evoBench, basicTest, {
-        double x = 1.0;
-        for (int i = 0; i < 1000; i++) {
-            x *= 1.1;
+    // ********** GetNumChildren ********** //
+    RUN_BENCH(evoBench, evo::GetNumChildren, "basic", {
+        thread_local RandRealDistribution rand(0.0, 100.0);
+        const double minVal = rand.get();
+        const double ourVal = minVal + rand.get();
+        const double maxVal = ourVal + rand.get();
+        return std::make_tuple(ourVal, minVal, maxVal);
+    });
+
+    RUN_BENCH(evoBench, KeepOnlyFirstAgents, "nontrivial", {
+        thread_local RandIntDistribution rand(1, 50);
+        const size_t numToKeep = rand.get();
+        evo::Generation gen;
+        for (size_t i = 0; i < numToKeep + rand.get(); i++) {
+            gen.agents.push_back(evo::Agent());
         }
+
+        return std::make_tuple(numToKeep, gen);
     });
 
-    
+    // ********** KeepOnlyFirstAgentsw ********** //
+    RUN_BENCH(evoBench, KeepOnlyFirstAgents, "trivial", {
+        thread_local RandIntDistribution rand(1, 50);
+        evo::Generation gen;
+        for (size_t i = 0; i < rand.get(); i++) {
+            gen.agents.push_back(evo::Agent());
+        }
+        const size_t numToKeep = gen.agents.size() + rand.get();
 
-    ADD_BENCH(getNumChildren, basic, {
-        evo::GetNumChildren(1.0, 0.1, 53.1);
+        return std::make_tuple(numToKeep, gen);
     });
 
-    RUN_BENCHMARK_SET(evoBench);
-    RUN_BENCHMARK_SET(getNumChildren);
+    // ********** SortGenerationByScores ********** //
+    RUN_BENCH(evoBench, SortGenerationByScores, "10", {
+        thread_local RandRealDistribution rand(0.001, 150.0);
+        evo::Generation gen;
+        for (size_t i = 0; i < 10; i++) {
+            evo::Agent agent;
+            agent.score = rand.get();
+            gen.agents.push_back(agent);
+        }
+
+        return std::make_tuple(gen);
+    });
+
+    RUN_BENCH(evoBench, SortGenerationByScores, "50", {
+        thread_local RandRealDistribution rand(0.001, 150.0);
+        evo::Generation gen;
+        for (size_t i = 0; i < 50; i++) {
+            evo::Agent agent;
+            agent.score = rand.get();
+            gen.agents.push_back(agent);
+        }
+
+        return std::make_tuple(gen);
+    });
+
+    RUN_BENCH(evoBench, SortGenerationByScores, "100", {
+        thread_local RandRealDistribution rand(0.001, 150.0);
+        evo::Generation gen;
+        for (size_t i = 0; i < 100; i++) {
+            evo::Agent agent;
+            agent.score = rand.get();
+            gen.agents.push_back(agent);
+        }
+
+        return std::make_tuple(gen);
+    });
+
+    END_BENCHMARK_SET(evoBench);
+
     return 0;
 }

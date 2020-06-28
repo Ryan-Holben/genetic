@@ -11,17 +11,27 @@ Example usage:
 
 ```c++
 #include <bench/benc.h>
-#include <iostream>
+
+#include <core/random.h>
+#include <evo/evo.h>
+
+int myFunc(bool option, int a, int b) { return option ? a + b : a - b; }
 
 
 int main() {
-    benchmarker evoBench;
+    DECLARE_BENCHMARK_SET(evoBench);
 
-    BENCH(evoBench, evo, basicTest, {
-       std::cout << "cool\n"; 
-    })
+    RUN_BENCH(evoBench, myFunc, "hello", { return std::make_tuple(false, 10, 4); });
+    
+    // Example of passing in a lambda that will be generating random inputs for our function
+    RUN_BENCH(evoBench, evo::GetNumChildren, "basic", {
+        thread_local RandRealDistribution rand(0.0, 100.0);
+        const double minVal = rand.get();
+        const double ourVal = minVal + rand.get();
+        const double maxVal = ourVal + rand.get();
+        return std::make_tuple(ourVal, minVal, maxVal);
+    });
 
-    evoBench.main();
     return 0;
 }
 ```
@@ -29,14 +39,9 @@ int main() {
 with build file:
 
 ```
-cc_library(
-    name = "evo",
-    # ...
-)
-
 cc_binary(
     name = "benchmark",
-    srcs = ["bench/bench-evo.cpp"],
-    deps = [":evo", "//bench:benchlib"],
+    srcs = ["bench/my-benchmarks.cpp"],
+    deps = ["//bench:benchlib"],
 )
 ```
