@@ -4,7 +4,7 @@
 
 namespace core {
 
-using Number = double;
+using Number = float;
 using Tuple = std::vector<Number>;
 using Datum = std::pair<Tuple, Tuple>;
 using Dataset = std::vector<Datum>;

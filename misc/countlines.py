@@ -4,7 +4,7 @@ import os
 from collections import Counter
 
 def main():
-    folders = "core datasets evo main misc".split()
+    folders = "bench core datasets evo main misc net".split()
     filters = "BUILD WORKSPACE cpp h cc hpp c py".split()
     filecount = Counter()
     linecount = Counter()

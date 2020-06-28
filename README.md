@@ -9,6 +9,7 @@ Build plastic neural networks by optimizing their structure and connections simu
 * [Common C++ Bazel BUILD patterns](https://docs.bazel.build/versions/master/cpp-use-cases.html)
 * [Googletest](https://github.com/google/googletest)
 * [Google benchmark](https://github.com/google/benchmark)
+* [colorizer.org RGB<->HSV tool](http://colorizer.org/)
 
 
 ## Organization
