@@ -9,8 +9,7 @@ py_binary(
 cc_library(
     name = "benchlib",
     srcs = [],
-    # hdrs = glob(["include/**/*.h"]),
-    hdrs = ["include/bench/benc.h"],
+    hdrs = ["include/bench/benc.h", "include/bench/colors.h"],
     includes = ["include"],
     deps = [],
     visibility = ["//visibility:public"]

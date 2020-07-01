@@ -3,16 +3,14 @@
 #include <core/random.h>
 #include <evo/evo.h>
 
-#include <iostream>
-
 void KeepOnlyFirstAgents(const size_t numToKeep, evo::Generation& gen) {
     evo::KeepOnlyFirstAgents(numToKeep, &gen);
 }
 
 void SortGenerationByScores(evo::Generation& gen) { evo::SortGenerationByScores(&gen); }
 
-int main() {
-    DECLARE_BENCHMARK_SET(evoBench);
+int main(int argc, char *argv[]) {
+    DECLARE_BENCHMARK_SET(evoBench, argc, argv);
 
     // ********** GetNumChildren ********** //
     RUN_BENCH(evoBench, evo::GetNumChildren, "basic", {

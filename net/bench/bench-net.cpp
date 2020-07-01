@@ -14,8 +14,8 @@ void MutateBiasesAndWeights(net::NeuralNetwork& net) {
     net.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
 }
 
-int main() {
-    DECLARE_BENCHMARK_SET(netBench);
+int main(int argc, char *argv[]) {
+    DECLARE_BENCHMARK_SET(netBench, argc, argv);
 
     // ********** NetworkBuilding ********** //
     RUN_BENCH(netBench, net::BuildOnesNetwork, "2x5x5x5x3", {
