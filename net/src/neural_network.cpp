@@ -10,20 +10,11 @@ bool inline isbad(Number val) { return std::isnan(val) || std::isinf(val); }
 
 // Apply the network to an input tuple, return the output tuple
 Tuple NeuralNetwork::compute(const Tuple& input) const {
-    ASSERT_WITH_MSG(input.size() == _layers[0].size(),
+    ASSERT_WITH_MSG(input.size() == _layers.front().size(),
                     "Input was size " << input.size() << " but the input layer has "
-                                      << _layers[0].size() << " neurons.");
+                                      << _layers.front().size() << " neurons.");
     for (const auto& x : input) {
         ASSERT_WITH_MSG(!isbad(x), "Input contained a NaN!");
-    }
-
-    for (size_t i = 0; i < _layers.size(); i++) {
-        for (size_t j = 0; j < _layers[i].size(); j++) {
-            ASSERT(!isbad(_layers[i][j].bias));
-            for (size_t k = 0; k < _layers[i][j].weights.size(); k++) {
-                ASSERT(!isbad(_layers[i][j].weights[k]));
-            }
-        }
     }
 
     const size_t width = getWidth();
@@ -46,52 +37,14 @@ Tuple NeuralNetwork::compute(const Tuple& input) const {
         for (size_t i = 0; i < curLayer.size(); i++) {
             // Compute current neuron's bias + all prev neuron's computed values multiplied by the
             // weight of the synapse connecting them to this neuron.
-
             Number value = curLayer[i].bias;
-            ASSERT(!isbad(value));
             for (size_t j = 0; j < prevLayer.size(); j++) {
                 const auto& prevNeuron = prevLayer[j];
-                // value += prevNeuron.weights[i] * prev[j];
-
-                if (isbad(value + prevNeuron.weights[i] * prev[j])) {
-                    std::cout << std::isnan(value) << ", " << std::isinf(value) << "\n";
-                    std::cout << "value " << value << "\n";
-                    value += prevNeuron.weights[i] * prev[j];
-                    std::cout << "Layer " << layerIdx << ", curNeur: " << i << ", prevNeur: " << j
-                              << "\n";
-                    std::cout << prevNeuron.weights[i] << ", " << prev[j] << "\n";
-                    std::cout << std::isinf(prevNeuron.weights[i]) << ", " << std::isinf(prev[j])
-                              << "\n";
-                    std::cout << std::isnan(prevNeuron.weights[i]) << ", " << std::isnan(prev[j])
-                              << "\n";
-                    std::cout << std::isnan(value) << ", " << std::isinf(value) << "\n";
-                    std::cout << "Structure: ";
-                    for (size_t A = 0; A < _layers.size(); A++) {
-                        std::cout << _layers[A].size() << ", ";
-                    }
-                    std::cout << "\n";
-                    ASSERT(!isbad(value));
-                }
                 value += prevNeuron.weights[i] * prev[j];
             }
-            const auto midVal = ActivationFunctionReLu(value);
-            ASSERT_WITH_MSG(!isbad(midVal), "ReLu gave a NaN!");
-            cur.push_back(midVal);
-            // cur.push_back(ActivationFunctionReLu(value));
+            cur.push_back(ActivationFunctionReLu(value));
         }
-        for (const auto& c : cur) {
-            ASSERT(!isbad(c));
-        }
-        // std::swap(cur, prev);
-        prev = cur;
-        for (const auto& p : prev) {
-            ASSERT(!isbad(p));
-        }
-        cur.clear();
-    }
-
-    for (const auto& x : prev) {
-        ASSERT_WITH_MSG(!isbad(x), "Input was fine but output has a NaN!");
+        std::swap(cur, prev);
     }
 
     return prev;
@@ -175,14 +128,6 @@ void NeuralNetwork::AddRandomLayer() {
         // Connect newLayer to the nextLayer with the kronecker delta function
         newLayer.push_back({.bias = 1.0, .weights = Tuple(newLayerSize, 0.0)});
         newLayer.back().weights[i] = 1.0;
-    }
-
-    // check new layer
-    for (size_t i = 0; i < newLayer.size(); i++) {
-        ASSERT(!isbad(newLayer[i].bias));
-        for (size_t j = 0; j < newLayer[i].weights.size(); j++) {
-            ASSERT(!isbad(newLayer[i].weights[j]));
-        }
     }
 
     // Insert the new layer

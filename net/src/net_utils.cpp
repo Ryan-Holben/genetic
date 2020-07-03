@@ -10,6 +10,7 @@ namespace net {
 // values.
 NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes) {
     NeuralNetwork net;
+    
     for (size_t i = 0; i + 1 < layerSizes.size(); i++) {
         net._layers.push_back(
             Layer(layerSizes[i], {.weights = Tuple(layerSizes[i + 1], 1.0), .bias = 1.0}));
@@ -23,7 +24,6 @@ NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes) {
 // within specified ranges.
 NeuralNetwork BuildRandomNetwork(const std::vector<size_t>& layerSizes) {
     NeuralNetwork net;
-    net._layers.reserve(layerSizes.size());
 
     for (size_t i = 0; i + 1 < layerSizes.size(); i++) {
         Layer layer;
