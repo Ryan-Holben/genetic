@@ -1,6 +1,5 @@
 #include <core/core.h>
-// #include <core/platform.h>
-#include <datasets/xor.h>
+#include <datasets/mnist.h>
 #include <evo/evo.h>
 
 #include <iostream>
@@ -10,12 +9,19 @@
 int main(int argc, char** argv) {
     core::InstallBacktraceHandler();
 
+    auto dataset = GetMnistTrainingSet();         // or = GetXorDataset()
+    if (dataset.empty()) {
+        std::cout << "MNIST failed somehow!\n";
+        return 1;
+    }
+    std::cout << "Loaded " << dataset.size() << " entries.\n";
+
     evo::Evolver evo;
-    evo.installTrainingData(BuildXorDataset());
+    evo.installTrainingData(std::move(dataset));
     evo.runAlgorithm(/* initialPopulation = */ 10,
-                     /* maxGenerations = */ 50,
+                     /* maxGenerations = */ 20,
                      /* targetScore = */ 0.01,
-                     /* defaultTopology = */ {2, 3, 5, 1});
+                     /* defaultTopology = */ {28*28, 10, 5, 1});
 
     // core::NeuralNetwork net;
     // net.buildOnesNetwork({2, 3, 19, 1});
@@ -28,4 +34,6 @@ int main(int argc, char** argv) {
     //               << datum.second[0] << " and we got " << output[0] << "\n";
     // }
     std::cout << "\n";
+
+    return 0;
 }

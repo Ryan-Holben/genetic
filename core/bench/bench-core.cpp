@@ -20,7 +20,7 @@ void RandRealDistributionGet(RandRealDistribution& rand) {
     rand.get();
 }
 
-void RandRealNormalDistributionGet(RandRealNormalDistribution& rand) {
+void RandGaussianDistributionGet(RandGaussianDistribution& rand) {
     rand.get();
 }
 
@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
         return std::make_tuple(RandRealDistribution(1,50));
     });
 
-    RUN_BENCH(coreBench, RandRealNormalDistributionGet, "basic", {
-        return std::make_tuple(RandRealNormalDistribution(1,50));
+    RUN_BENCH(coreBench, RandGaussianDistributionGet, "basic", {
+        return std::make_tuple(RandGaussianDistribution(10.0, 3.0, 5.0, 12.5));
     });
 
     RUN_BENCH(coreBench, DiceRoll, "basic", {

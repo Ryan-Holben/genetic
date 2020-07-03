@@ -17,7 +17,7 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
 
     // Instantiate the first generation.
     Generation currentGen;
-    currentGen.GenerateOnesNetworks(initialPopulation, defaultTopology);
+    currentGen.GenerateRandomNetworks(initialPopulation, defaultTopology);
     std::cout << "Seeded population pool with " << currentGen.agents.size() << " agents.\n";
 
     // Run through generations, reproducing, evolving, and culling agents until one meets the target
@@ -47,6 +47,16 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         ComputeGenerationStats(&currentGen);
         std::cout << "\x1b[1;33mScore range: " << currentGen.bestScore << ", "
                   << currentGen.worstScore << "\x1b[0m\n";
+
+        const auto & best = currentGen.agents[0];
+        for(size_t i = 0; i < 5; i++) {
+            const auto output = best.brain.compute(_trainingData[i].first);
+            std::cout << "expected: " << _trainingData[i].second[0] << ", got: " << output[0] << "\n";
+            // for (size_t j = 0; j < 28*28; j++) {
+            //     std::cout << _trainingData[i].first[j] << ",";
+            // }
+            // std::cout << "\n====\n";
+        }
 
         // MOVE the current gen to the annals of history.
         // CRITICAL NOTES:

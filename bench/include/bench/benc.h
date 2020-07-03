@@ -127,26 +127,32 @@ class Benchmarker {
             return;
         }
         std::cout << "\n";
+
+        // Sort the results from most to least expensive mean runtime
         std::sort(_results.begin(), _results.end(),
                   [](BenchmarkResult& a, BenchmarkResult& b) { return a.mean > b.mean; });
         const double maxMean = _results.front().mean;
         const double minMean = _results.back().mean;
 
-        std::string path = std::getenv("BUILD_WORKSPACE_DIRECTORY");
-        path += "/bench/" + _outpath;
-
-        std::ofstream outfile;
-        outfile.open(path, std::ofstream::out | std::ofstream::app);
-        std::cout << "Appending results to file " << path << "\n";
-
+        // Output results to screen
         for (const auto& result : _results) {
             printBenchmarkResult(result, minMean, maxMean);
-            outfile << _launchTime << "," << _name << "," << result.funcName << "," << result.testName << ","
-                    << result.mean << "," << result.variance << "," << result.standardDeviation
-                    << "," << result.coefficientOfVariation << "\n";
         }
 
-        outfile.close();
+        // Output results to disk if a file path was specified
+        if (_outpath != "") {
+            std::string path = std::getenv("BUILD_WORKSPACE_DIRECTORY");
+            path += "/bench/" + _outpath;
+            std::ofstream outfile;
+            outfile.open(path, std::ofstream::out | std::ofstream::app);
+            std::cout << "Appending results to file " << path << "\n";
+            for (const auto& result : _results) {
+                outfile << _launchTime << "," << _name << "," << result.funcName << ","
+                        << result.testName << "," << result.mean << "," << result.variance << ","
+                        << result.standardDeviation << "," << result.coefficientOfVariation << "\n";
+            }
+            outfile.close();
+        }
     }
 
   private:

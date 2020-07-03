@@ -8,14 +8,11 @@ cc_library(
     visibility = ["//main:__pkg__"],
 )
 
-# cc_test (
-#     name = "neural-network-core",
-#     srcs = [
-#         "test/unit-tests.cpp",
-#     ],
-#     deps = [
-#         ":datasets",
-#         "@gtest//:gtest",
-#         "@gtest//:gtest_main", # Only if hello_test.cc has no main()
-#     ],
-# )
+cc_library(
+    name = "mnist",
+    hdrs = ["include/datasets/mnist.h"],
+    data = [":data/train-images-idx3-ubyte", ":data/train-labels-idx1-ubyte"],
+    includes = ["include"],
+    deps = ["//core:core"],
+    visibility = ["//main:__pkg__"],
+)

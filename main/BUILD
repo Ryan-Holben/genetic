@@ -5,6 +5,7 @@ cc_binary(
     srcs = ["main.cpp"],
     deps = [
         "//core",
+        "//datasets:mnist",
         "//datasets:xor",
         "//evo",
     ],

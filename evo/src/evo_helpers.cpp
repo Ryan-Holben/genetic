@@ -13,6 +13,9 @@ void RunAndScoreGeneration(Dataset& dataset, Generation* gen) {
         agent.score = 0.0;
         for (const auto& datum : dataset) {
             const auto result = agent.brain.compute(datum.first);
+            for (const auto& element : result) {
+                ASSERT_WITH_MSG(!std::isnan(element), "Neural net output included a NaN!");
+            }
             agent.score += L2_SQUARED(datum.second, result);
         }
     }
@@ -75,6 +78,10 @@ void ComputeGenerationStats(Generation* gen) {
     gen->bestScore = bestAgent.score;
     gen->worstScore = worstAgent.score;
 
+    ASSERT_WITH_MSG(gen->bestScore <= gen->worstScore,
+                    "Best & worst scores don't make sense.  bestScore = "
+                        << gen->bestScore << ", worstScore = " << gen->worstScore);
+
     gen->averageScore = 0.0;
     for (const auto& agent : gen->agents) {
         gen->averageScore += agent.score;
@@ -113,7 +120,7 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
                 numNewNeurons++;
             }
 
-            // Add a new neuron?
+            // Add a new layer?
             if (constants::mutation::chance::NewLayer.roll()) {
                 agent.brain.AddRandomLayer();
                 numNewLayers++;
@@ -127,10 +134,8 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
         }
         newGen.numChildren += numChildren;
     }
-    std::cout << "Added " << numNewNeurons << " neurons.\n";
-    std::cout << "Added " << numNewLayers << " layers.\n";
-    std::cout << "Mutated " << numBiasMutations << " biases and " << numWeightMutations
-              << " weights.\n";
+    std::cout << "Added " << numNewNeurons << " neurons & " << numNewLayers << " layers, mutated "
+              << numBiasMutations << " biases & " << numWeightMutations << " weights.\n";
 
     return newGen;
 }

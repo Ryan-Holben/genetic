@@ -12,10 +12,24 @@ static RandIntDistribution IndexSelector(0, 10); // Used for choosing indices in
 static RandRealDistribution RandomBias(-1.0, 1.0);
 static RandRealDistribution RandomWeight(-1.0, 1.0);
 
-static Dice ChanceOfBiasMutation(0.2);
-static Dice ChanceOfWeightMutation(0.1);
-static RandRealNormalDistribution AmountOfBiasMutation(-0.2, 0.2);
-static RandRealNormalDistribution AmountOfWeightMutation(-0.2, 0.2);
+// static Dice ChanceOfBiasMutation(0.20);
+// static Dice ChanceOfWeightMutation(0.20);
+
+// These density values MUST be in the open interval (0.0, 0.5)
+constexpr Number biasMutationMean = 0.05;
+constexpr Number biasMutationStdev = 0.341 * biasMutationMean;
+constexpr Number weightMutationMean = 0.05;
+constexpr Number weightMutationStdev = 0.341 * weightMutationMean;
+// 1. First choose how many edits will occur
+static RandGaussianDistribution BiasMutationRate(biasMutationMean, biasMutationStdev, 0.0, 1.0);
+static RandGaussianDistribution WeightMutationRate(weightMutationMean, weightMutationStdev, 0.0,
+                                                   1.0);
+// 2. Run this a bunch of times to choose *where* to edit neurons and weights
+static RandIntDistribution BiasIndexSelector(0, 10);
+static RandIntDistribution WeightIndexSelector(0, 10);
+
+static RandGaussianDistribution AmountOfBiasMutation(0.0, 0.3, -2.0, 2.0);
+static RandGaussianDistribution AmountOfWeightMutation(0.0, 0.3, -2.0, 2.0);
 
 struct Neuron {
     Tuple weights;

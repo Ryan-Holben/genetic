@@ -13,14 +13,14 @@ namespace constants {
     }
 
     namespace population {
-        constexpr size_t MAX_NUM_AGENTS = 100;
+        constexpr size_t MAX_NUM_AGENTS = 50;
         constexpr size_t MAX_NUM_CHILDREN = 8;
     }
 
     namespace mutation {
         namespace chance {
-            static core::Dice NewNeuron(0.05);
-            static core::Dice NewLayer(0.01);
+            static core::Dice NewNeuron(0.20);
+            static core::Dice NewLayer(0.05);
             // static core::Dice NewNeuron(0.05);
             // static core::Dice NewNeuron(0.05);
         }

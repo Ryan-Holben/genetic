@@ -38,7 +38,13 @@ struct Generation {
     void GenerateOnesNetworks(size_t numAgents, const std::vector<size_t>& defaultTopology) {
         agents.clear();
         for (size_t i = 0; i < numAgents; i++) {
-            // agents.push_back(Agent(BuildOnesNetwork(defaultTopology)));
+            agents.push_back(Agent(net::BuildOnesNetwork(defaultTopology)));
+        }
+    }
+
+    void GenerateRandomNetworks(size_t numAgents, const std::vector<size_t>& defaultTopology) {
+        agents.clear();
+        for (size_t i = 0; i < numAgents; i++) {
             agents.push_back(Agent(net::BuildRandomNetwork(defaultTopology)));
         }
     }
