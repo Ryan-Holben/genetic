@@ -48,6 +48,7 @@ class NeuralNetwork {
     size_t getDepth() const;
     size_t getNumNeurons() const;
     size_t getNumConnections() const;
+    std::vector<size_t> getTopology() const;
 
     // Mutations
     void AddRandomNeuron();

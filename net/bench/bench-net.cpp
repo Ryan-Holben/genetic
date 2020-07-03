@@ -10,11 +10,12 @@ void AddRandomNeuron(net::NeuralNetwork& net) { net.AddRandomNeuron(); }
 void AddRandomLayer(net::NeuralNetwork& net) { net.AddRandomLayer(); }
 
 void MutateBiasesAndWeights(net::NeuralNetwork& net) {
-    size_t numBiasMutations, numWeightMutations;
+    size_t numBiasMutations = 0;
+    size_t numWeightMutations = 0;
     net.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     DECLARE_BENCHMARK_SET(netBench, argc, argv);
 
     // ********** NetworkBuilding ********** //
@@ -66,7 +67,10 @@ int main(int argc, char *argv[]) {
     RUN_BENCH(netBench, ComputeNeuralNetwork, "10x1000x5x3", {
         thread_local RandRealDistribution rand(-5.0, 5.0);
         const auto network = net::BuildRandomNetwork({10, 1000, 5, 3});
-        Tuple input({rand.get(), rand.get()});
+        Tuple input{};
+        for (size_t i = 0; i < 10; i++) {
+            input.push_back(rand.get());
+        }
         return std::make_tuple(network, input);
     });
 
@@ -104,10 +108,10 @@ int main(int argc, char *argv[]) {
     });
 
     // ********** MutateBiasesAndWeights ********** //
-    RUN_BENCH(netBench, MutateBiasesAndWeights, "2x5x5x5x3", {
-        const auto network = net::BuildRandomNetwork({2, 5, 5, 5, 3});
-        return std::make_tuple(network);
-    });
+    // RUN_BENCH(netBench, MutateBiasesAndWeights, "2x5x5x5x3", {
+    //     const auto network = net::BuildRandomNetwork({2, 5, 5, 5, 3});
+    //     return std::make_tuple(network);
+    // });
 
     RUN_BENCH(netBench, MutateBiasesAndWeights, "2x100x100x100x3", {
         const auto network = net::BuildRandomNetwork({2, 100, 100, 100, 3});

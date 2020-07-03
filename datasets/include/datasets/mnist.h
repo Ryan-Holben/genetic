@@ -13,7 +13,10 @@ uint32_t GetLittleEndian4Bytes(std::ifstream& stream) {
 }
 
 // http://yann.lecun.com/exdb/mnist/
-core::Dataset GetMnistTrainingSet() {
+// If useBoolClassifier == true, then the output is a 10-dimensional vector with one 1 and the rest
+// 0. If useBoolClassifier == false, then the output is a single value that equals the number of the
+// digit.
+core::Dataset GetMnistTrainingSet(bool useBoolClassifier) {
     core::Dataset d;
 
     std::ifstream labels;
@@ -49,13 +52,26 @@ core::Dataset GetMnistTrainingSet() {
     const size_t numCols = GetLittleEndian4Bytes(images);
     const size_t imageSize = numRows * numCols;
 
-    for (size_t i = 0; i < 10; i++) {
-        core::Datum entry;
-        entry.second = {labels.get()};
-        for (size_t j = 0; j < imageSize; j++) {
-            entry.first.push_back((core::Number)(images.get())/255.0);
+    constexpr size_t numToLoad = 10;
+    if (useBoolClassifier) {
+        for (size_t i = 0; i < numToLoad; i++) {
+            core::Datum entry;
+            entry.second = core::Tuple(10, 0.0);
+            entry.second[labels.get()] = 1.0;
+            for (size_t j = 0; j < imageSize; j++) {
+                entry.first.push_back((core::Number)(images.get()) / 255.0);
+            }
+            d.push_back(entry);
         }
-        d.push_back(entry);
+    } else {
+        for (size_t i = 0; i < numToLoad; i++) {
+            core::Datum entry;
+            entry.second = {labels.get()};
+            for (size_t j = 0; j < imageSize; j++) {
+                entry.first.push_back((core::Number)(images.get()) / 255.0);
+            }
+            d.push_back(entry);
+        }
     }
 
     labels.close();

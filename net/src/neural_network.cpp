@@ -127,6 +127,14 @@ size_t NeuralNetwork::getNumConnections() const {
     return num;
 }
 
+std::vector<size_t> NeuralNetwork::getTopology() const {
+    std::vector<size_t> topology;
+    for (const auto& layer : _layers) {
+        topology.push_back(layer.size());
+    }
+    return topology;
+}
+
 void NeuralNetwork::AddRandomNeuron() {
     // We can't modify the first or last layer, as they define the input & output
     IndexSelector.setDist(1, getDepth() - 2);

@@ -24,7 +24,7 @@ class RandIntDistribution : RandBase {
   public:
     RandIntDistribution(int low, int high) : RandBase() { setDist(low, high); }
     void setDist(int low, int high) {
-        ASSERT(low < high);
+        ASSERT(low <= high);
         _dist = std::make_unique<std::uniform_int_distribution<>>(low, high);
     }
     int get() { return (*_dist)(_rng); }
@@ -64,11 +64,11 @@ class RandGaussianDistribution : RandBase {
     Number get() {
         const Number val = (*_dist)(_rng);
         if (val < _minVal) {
-          return _minVal;
+            return _minVal;
         } else if (val > _maxVal) {
-          return _maxVal;
+            return _maxVal;
         } else {
-          return val;
+            return val;
         }
     }
 

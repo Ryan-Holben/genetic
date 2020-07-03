@@ -9,19 +9,21 @@
 int main(int argc, char** argv) {
     core::InstallBacktraceHandler();
 
-    auto dataset = GetMnistTrainingSet();         // or = GetXorDataset()
+    auto dataset = GetMnistTrainingSet(false); // or = GetXorDataset()
     if (dataset.empty()) {
         std::cout << "MNIST failed somehow!\n";
         return 1;
     }
     std::cout << "Loaded " << dataset.size() << " entries.\n";
+    const size_t inputSize = dataset[0].first.size();
+    const size_t outputSize = dataset[0].second.size();
 
     evo::Evolver evo;
     evo.installTrainingData(std::move(dataset));
     evo.runAlgorithm(/* initialPopulation = */ 10,
-                     /* maxGenerations = */ 20,
+                     /* maxGenerations = */ 10,
                      /* targetScore = */ 0.01,
-                     /* defaultTopology = */ {28*28, 10, 5, 1});
+                     /* defaultTopology = */ {inputSize, 10, 5, 5, outputSize});
 
     // core::NeuralNetwork net;
     // net.buildOnesNetwork({2, 3, 19, 1});

@@ -4,58 +4,36 @@
 
 using namespace core;
 
-void RandIntDistributionConstructor() {
-    RandIntDistribution r(1, 10);
-}
+void RandIntDistributionConstructor() { RandIntDistribution r(1, 10); }
 
-void DiceConstructor() {
-    Dice r(0.1);
-}
+void DiceConstructor() { Dice r(0.1); }
 
-void RandIntDistributionGet(RandIntDistribution& rand) {
-    rand.get();
-}
+void RandIntDistributionGet(RandIntDistribution& rand) { rand.get(); }
 
-void RandRealDistributionGet(RandRealDistribution& rand) {
-    rand.get();
-}
+void RandRealDistributionGet(RandRealDistribution& rand) { rand.get(); }
 
-void RandGaussianDistributionGet(RandGaussianDistribution& rand) {
-    rand.get();
-}
+void RandGaussianDistributionGet(RandGaussianDistribution& rand) { rand.get(); }
 
-void DiceRoll(Dice& rand) {
-    rand.roll();
-}
+void DiceRoll(Dice& rand) { rand.roll(); }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     DECLARE_BENCHMARK_SET(coreBench, argc, argv);
 
     // ********** random.h ********** //
-    RUN_BENCH(coreBench, RandIntDistributionConstructor, "basic", {
-        return std::make_tuple();
-    });
+    RUN_BENCH(coreBench, RandIntDistributionConstructor, "basic", { return std::make_tuple(); });
 
-    RUN_BENCH(coreBench, DiceConstructor, "basic", {
-        return std::make_tuple();
-    });
+    RUN_BENCH(coreBench, DiceConstructor, "basic", { return std::make_tuple(); });
 
-    RUN_BENCH(coreBench, RandIntDistributionGet, "basic", {
-        return std::make_tuple(RandIntDistribution(1,50));
-    });
+    RUN_BENCH(coreBench, RandIntDistributionGet, "basic",
+              { return std::make_tuple(RandIntDistribution(1, 50)); });
 
+    RUN_BENCH(coreBench, RandRealDistributionGet, "basic",
+              { return std::make_tuple(RandRealDistribution(1, 50)); });
 
-    RUN_BENCH(coreBench, RandRealDistributionGet, "basic", {
-        return std::make_tuple(RandRealDistribution(1,50));
-    });
+    RUN_BENCH(coreBench, RandGaussianDistributionGet, "basic",
+              { return std::make_tuple(RandGaussianDistribution(10.0, 3.0, 5.0, 12.5)); });
 
-    RUN_BENCH(coreBench, RandGaussianDistributionGet, "basic", {
-        return std::make_tuple(RandGaussianDistribution(10.0, 3.0, 5.0, 12.5));
-    });
-
-    RUN_BENCH(coreBench, DiceRoll, "basic", {
-        return std::make_tuple(Dice(0.1));
-    });
+    RUN_BENCH(coreBench, DiceRoll, "basic", { return std::make_tuple(Dice(0.1)); });
 
     // ********** math.h ********** //
     RUN_BENCH(coreBench, ActivationFunctionReLu, "basic", {

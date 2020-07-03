@@ -9,7 +9,7 @@ void KeepOnlyFirstAgents(const size_t numToKeep, evo::Generation& gen) {
 
 void SortGenerationByScores(evo::Generation& gen) { evo::SortGenerationByScores(&gen); }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     DECLARE_BENCHMARK_SET(evoBench, argc, argv);
 
     // ********** GetNumChildren ********** //

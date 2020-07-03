@@ -5,6 +5,26 @@
 
 using namespace core;
 
+// Return the first index that's equal to 1.0
+int vecToInt(const std::vector<Number>& vec) {
+    for (size_t i = 0; i < vec.size(); i++) {
+        if (vec[i] == 1.0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Pretty print a vector
+template <typename T> std::string vecToStr(const std::vector<T>& vec) {
+    std::string s = "[";
+    for (size_t i = 0; i < vec.size() - 1; i++) {
+        s += std::to_string(vec[i]) + ", ";
+    }
+    s += std::to_string(vec.back()) + "]";
+    return s;
+}
+
 namespace evo {
 
 void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Number targetScore,
@@ -48,15 +68,16 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         std::cout << "\x1b[1;33mScore range: " << currentGen.bestScore << ", "
                   << currentGen.worstScore << "\x1b[0m\n";
 
-        const auto & best = currentGen.agents[0];
-        for(size_t i = 0; i < 5; i++) {
+        const auto& best = currentGen.agents[0];
+        for (size_t i = 0; i < 5; i++) {
             const auto output = best.brain.compute(_trainingData[i].first);
-            std::cout << "expected: " << _trainingData[i].second[0] << ", got: " << output[0] << "\n";
-            // for (size_t j = 0; j < 28*28; j++) {
-            //     std::cout << _trainingData[i].first[j] << ",";
-            // }
-            // std::cout << "\n====\n";
+            std::cout << "expected: " << _trainingData[i].second[0] << ", got: " << output[0]
+                      << "\n";
+            // std::cout << "expected: " << vecToInt(_trainingData[i].second) << ", got: " <<
+            // vecToStr(output) << "\n";
         }
+        const auto topo = best.brain.getTopology();
+        std::cout << "Best topology: " << vecToStr(topo) << "\n";
 
         // MOVE the current gen to the annals of history.
         // CRITICAL NOTES:
