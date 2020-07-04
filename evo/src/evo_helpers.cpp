@@ -78,6 +78,9 @@ void ComputeGenerationStats(Generation* gen) {
     gen->bestScore = bestAgent.score;
     gen->worstScore = worstAgent.score;
 
+    gen->bestNumNeurons = bestAgent.brain.getNumNeurons();
+    gen->worstNumNeurons = worstAgent.brain.getNumNeurons();
+
     ASSERT_WITH_MSG(gen->bestScore <= gen->worstScore,
                     "Best & worst scores don't make sense.  bestScore = "
                         << gen->bestScore << ", worstScore = " << gen->worstScore);
@@ -100,6 +103,7 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
 
     newGen.mutationsNumNewLayers = 0;
     newGen.mutationsNumNewNeurons = 0;
+    newGen.mutationsNumRemovedNeurons = 0;
     newGen.mutationsNumBiasChanges = 0;
     newGen.mutationsNumWeightChanges = 0;
 
@@ -114,6 +118,13 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
             auto child = agent;
 
             // 2-b. Mutate the child
+
+            // Remove a neuron?
+            if (constants::mutation::chance::RemoveNeuron.roll()) {
+                agent.brain.RemoveRandomNeuron();
+                newGen.mutationsNumRemovedNeurons++;
+            }
+
             // Add a new neuron?
             if (constants::mutation::chance::NewNeuron.roll()) {
                 agent.brain.AddRandomNeuron();
@@ -136,9 +147,9 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
         newGen.numChildren += numChildren;
     }
     std::cout << "Added " << newGen.mutationsNumNewNeurons << " neurons & "
-              << newGen.mutationsNumNewLayers << " layers, mutated "
-              << newGen.mutationsNumBiasChanges << " biases & " << newGen.mutationsNumWeightChanges
-              << " weights.\n";
+              << newGen.mutationsNumNewLayers << " layers, removed "
+              << newGen.mutationsNumRemovedNeurons << ", mutated " << newGen.mutationsNumBiasChanges
+              << " biases & " << newGen.mutationsNumWeightChanges << " weights.\n";
 
     return newGen;
 }

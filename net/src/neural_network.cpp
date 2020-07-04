@@ -2,6 +2,7 @@
 #include <core/platform.h>
 #include <net/neural_network.h>
 
+#include <algorithm>
 #include <set>
 
 namespace net {
@@ -92,11 +93,15 @@ std::vector<size_t> NeuralNetwork::getTopology() const {
 
 void NeuralNetwork::AddRandomNeuron() {
     // We can't modify the first or last layer, as they define the input & output
-    IndexSelector.setDist(1, getDepth() - 2);
-    size_t layerIdx = IndexSelector.get();
+    if (const size_t depth = getDepth(); depth < 3) {
+        return;
+    } else {
+        IndexSelector.setDist(1, depth - 2);
+    }
+    const size_t layerIdx = IndexSelector.get();
     auto prevLayer = std::next(_layers.begin(), layerIdx - 1);
     auto curLayer = std::next(prevLayer);
-    auto nextLayer = std::next(curLayer);
+    const auto nextLayer = std::next(curLayer);
 
     // We place the neuron at the back of this layer, because it's fully connected to its adjacent
     // layers anyway, so order doesn't matter.
@@ -113,16 +118,52 @@ void NeuralNetwork::AddRandomNeuron() {
     }
 }
 
+void NeuralNetwork::RemoveRandomNeuron() {
+    // We can't modify the first or last layer, as they define the input & output
+    if (const size_t depth = getDepth(); depth < 3) {
+        return;
+    } else {
+        IndexSelector.setDist(1, depth - 2);
+    }
+    const size_t layerIdx = IndexSelector.get();
+    auto prevLayer = std::next(_layers.begin(), layerIdx - 1);
+    auto curLayer = std::next(prevLayer);
+
+    // If this layer has only 1 neuron, remove the layer.  The previous layer will be given random
+    // weights connecting it to the next layer.
+    if (curLayer->size() == 1) {
+        auto nextLayer = std::next(curLayer);
+        for (auto& node : *prevLayer) {
+            node.weights.reserve(nextLayer->size());
+            std::generate_n(std::back_inserter(node.weights), nextLayer->size(),
+                            []() { return RandomWeight.get(); });
+        }
+        _layers.erase(curLayer);
+        return;
+    }
+    // Choose a random neuron in this layer to remove
+    IndexSelector.setDist(0, curLayer->size() - 1);
+    const size_t neuronIdx = IndexSelector.get();
+
+    // Remove connections to this neuron from the previous layer
+    for (auto& neuron : *prevLayer) {
+        neuron.weights.erase(neuron.weights.begin() + neuronIdx);
+    }
+
+    // Remove the neuron itself
+    curLayer->erase(curLayer->begin() + neuronIdx);
+}
+
 void NeuralNetwork::AddRandomLayer() {
     // Choose an index that cannot be 0.  Push the layer there back to the next index.  E.g. if
     // layerIdx == 1, then [a, b, c, d] becomes [a, NEW, b, c, d].
     IndexSelector.setDist(1, getDepth() - 1);
-    size_t layerIdx = IndexSelector.get();
+    const size_t layerIdx = IndexSelector.get();
 
     // Here's the adjacent layers that we're inserting inbetween
     // auto& prevLayer = _layers[layerIdx - 1];     // Not actually used
     // auto& nextLayer = _layers[layerIdx];
-    auto nextLayer = std::next(_layers.begin(), layerIdx);
+    const auto nextLayer = std::next(_layers.begin(), layerIdx);
 
     // Build the new layer.  It will have the size and biases of nextLayer.  However, its weights
     // will be a kronecker delta.  That is, at first this new layer is almost trivial, so that

@@ -52,7 +52,7 @@ core::Dataset GetMnistTrainingSet(bool useBoolClassifier) {
     const size_t numCols = GetLittleEndian4Bytes(images);
     const size_t imageSize = numRows * numCols;
 
-    constexpr size_t numToLoad = 10;
+    constexpr size_t numToLoad = 20;
     if (useBoolClassifier) {
         for (size_t i = 0; i < numToLoad; i++) {
             core::Datum entry;

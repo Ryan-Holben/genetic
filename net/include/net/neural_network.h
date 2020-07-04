@@ -53,6 +53,7 @@ class NeuralNetwork {
     std::vector<size_t> getTopology() const;
 
     // Mutations
+    void RemoveRandomNeuron();
     void AddRandomNeuron();
     void AddRandomLayer();
     void MutateBiasesAndWeights(size_t* numBiasMutations, size_t* numWeightMutations);
