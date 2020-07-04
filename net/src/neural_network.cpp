@@ -17,9 +17,8 @@ Tuple NeuralNetwork::compute(const Tuple& input) const {
         ASSERT_WITH_MSG(!isbad(x), "Input contained a NaN!");
     }
 
-    const size_t width = getWidth();
-
     Tuple prev, cur;
+    const size_t width = getWidth();
     prev.reserve(width);
     cur.reserve(width);
 
@@ -29,9 +28,10 @@ Tuple NeuralNetwork::compute(const Tuple& input) const {
     }
 
     // Loop through each layer
-    for (size_t layerIdx = 1; layerIdx < _layers.size(); layerIdx++) {
-        const auto& curLayer = _layers[layerIdx];
-        const auto& prevLayer = _layers[layerIdx - 1];
+    auto iter = _layers.begin();
+    for (iter++; iter != _layers.end(); iter++) {
+        const auto& curLayer = *iter;
+        const auto& prevLayer = *std::prev(iter);
 
         // Loop through all neurons in this layer
         for (size_t i = 0; i < curLayer.size(); i++) {
@@ -39,12 +39,12 @@ Tuple NeuralNetwork::compute(const Tuple& input) const {
             // weight of the synapse connecting them to this neuron.
             Number value = curLayer[i].bias;
             for (size_t j = 0; j < prevLayer.size(); j++) {
-                const auto& prevNeuron = prevLayer[j];
-                value += prevNeuron.weights[i] * prev[j];
+                value += prevLayer[j].weights[i] * prev[j];
             }
             cur.push_back(ActivationFunctionReLu(value));
         }
         std::swap(cur, prev);
+        cur.clear();
     }
 
     return prev;
@@ -74,8 +74,10 @@ size_t NeuralNetwork::getNumNeurons() const {
 // Returns the number of connections/synapses between the neurons
 size_t NeuralNetwork::getNumConnections() const {
     size_t num = 0;
-    for (size_t layerIdx = 0; layerIdx + 1 < _layers.size(); layerIdx++) {
-        num += _layers[layerIdx].size() * _layers[layerIdx + 1].size();
+    auto iter = _layers.begin();
+    for (size_t i = 0; i < _layers.size() - 1; i++) {
+        num += iter->size() * std::next(iter)->size();
+        iter++;
     }
     return num;
 }
@@ -92,19 +94,22 @@ void NeuralNetwork::AddRandomNeuron() {
     // We can't modify the first or last layer, as they define the input & output
     IndexSelector.setDist(1, getDepth() - 2);
     size_t layerIdx = IndexSelector.get();
+    auto prevLayer = std::next(_layers.begin(), layerIdx - 1);
+    auto curLayer = std::next(prevLayer);
+    auto nextLayer = std::next(curLayer);
 
     // We place the neuron at the back of this layer, because it's fully connected to its adjacent
     // layers anyway, so order doesn't matter.
     Neuron node;
     node.bias = RandomBias.get();
-    node.weights.reserve(_layers[layerIdx + 1].size());
-    std::generate_n(std::back_inserter(node.weights), _layers[layerIdx + 1].size(),
+    node.weights.reserve(nextLayer->size());
+    std::generate_n(std::back_inserter(node.weights), nextLayer->size(),
                     []() { return RandomWeight.get(); });
-    _layers[layerIdx].push_back(node);
+    curLayer->push_back(node);
 
     // Then we add connections to this neuron from each neuron in the previous layer
-    for (size_t i = 0; i < _layers[layerIdx - 1].size(); i++) {
-        _layers[layerIdx - 1][i].weights.push_back(RandomWeight.get());
+    for (size_t i = 0; i < prevLayer->size(); i++) {
+        (*prevLayer)[i].weights.push_back(RandomWeight.get());
     }
 }
 
@@ -116,13 +121,14 @@ void NeuralNetwork::AddRandomLayer() {
 
     // Here's the adjacent layers that we're inserting inbetween
     // auto& prevLayer = _layers[layerIdx - 1];     // Not actually used
-    auto& nextLayer = _layers[layerIdx];
+    // auto& nextLayer = _layers[layerIdx];
+    auto nextLayer = std::next(_layers.begin(), layerIdx);
 
     // Build the new layer.  It will have the size and biases of nextLayer.  However, its weights
     // will be a kronecker delta.  That is, at first this new layer is almost trivial, so that
     // introducing it doesn't create a huge jump in behavior.
     Layer newLayer;
-    const size_t newLayerSize = nextLayer.size();
+    const size_t newLayerSize = nextLayer->size();
     newLayer.reserve(newLayerSize);
     for (size_t i = 0; i < newLayerSize; i++) {
         // Connect newLayer to the nextLayer with the kronecker delta function
@@ -131,7 +137,7 @@ void NeuralNetwork::AddRandomLayer() {
     }
 
     // Insert the new layer
-    _layers.insert(_layers.begin() + layerIdx, newLayer);
+    _layers.insert(nextLayer, newLayer);
 }
 
 // Mutate biases & weights throughout the neural network randomly.  Rather than rolling RNG for
