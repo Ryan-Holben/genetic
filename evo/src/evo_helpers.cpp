@@ -98,10 +98,10 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
         newGen.agents.insert(newGen.agents.begin(), lastGen.agents.begin(), lastGen.agents.end());
     }
 
-    size_t numNewNeurons = 0;
-    size_t numNewLayers = 0;
-    size_t numBiasMutations = 0;
-    size_t numWeightMutations = 0;
+    newGen.mutationsNumNewLayers = 0;
+    newGen.mutationsNumNewNeurons = 0;
+    newGen.mutationsNumBiasChanges = 0;
+    newGen.mutationsNumWeightChanges = 0;
 
     for (auto agent : lastGen.agents) {
         // 1. Get number of children for the agent
@@ -117,25 +117,28 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
             // Add a new neuron?
             if (constants::mutation::chance::NewNeuron.roll()) {
                 agent.brain.AddRandomNeuron();
-                numNewNeurons++;
+                newGen.mutationsNumNewNeurons++;
             }
 
             // Add a new layer?
             if (constants::mutation::chance::NewLayer.roll()) {
                 agent.brain.AddRandomLayer();
-                numNewLayers++;
+                newGen.mutationsNumNewLayers++;
             }
 
             // Mutate weights and biases
-            agent.brain.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
+            agent.brain.MutateBiasesAndWeights(&newGen.mutationsNumBiasChanges,
+                                               &newGen.mutationsNumWeightChanges);
 
             // 2-c. Push the child to the output
             newGen.agents.push_back(child);
         }
         newGen.numChildren += numChildren;
     }
-    std::cout << "Added " << numNewNeurons << " neurons & " << numNewLayers << " layers, mutated "
-              << numBiasMutations << " biases & " << numWeightMutations << " weights.\n";
+    std::cout << "Added " << newGen.mutationsNumNewNeurons << " neurons & "
+              << newGen.mutationsNumNewLayers << " layers, mutated "
+              << newGen.mutationsNumBiasChanges << " biases & " << newGen.mutationsNumWeightChanges
+              << " weights.\n";
 
     return newGen;
 }

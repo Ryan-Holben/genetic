@@ -28,7 +28,7 @@ double variance(const std::vector<double>& vec, double mean) {
         double diff = vec[i] - mean;
         sum += diff * diff;
     }
-    return sum / (vec.size());
+    return sum / vec.size();
 }
 
 double standardDeviation(const double variance) { return sqrt(variance); }
@@ -91,7 +91,6 @@ class Benchmarker {
 
         bench.totalDuration = 0.0;
         bench.numIterations = 0;
-        const auto start = std::chrono::high_resolution_clock::now();
         while (true) {
             bench.times.push_back(timeFunctionCall(func, generator).count());
             bench.numIterations++;

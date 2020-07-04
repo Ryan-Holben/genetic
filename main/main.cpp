@@ -21,9 +21,10 @@ int main(int argc, char** argv) {
     evo::Evolver evo;
     evo.installTrainingData(std::move(dataset));
     evo.runAlgorithm(/* initialPopulation = */ 10,
-                     /* maxGenerations = */ 10,
+                     /* maxGenerations = */ 50,
                      /* targetScore = */ 0.01,
                      /* defaultTopology = */ {inputSize, 10, 5, 5, outputSize});
+    evo.saveOutput("output");
 
     // core::NeuralNetwork net;
     // net.buildOnesNetwork({2, 3, 19, 1});

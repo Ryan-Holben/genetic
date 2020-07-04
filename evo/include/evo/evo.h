@@ -17,6 +17,7 @@ class Evolver {
                       const std::vector<size_t>& defaultTopology);
 
     void installTrainingData(Dataset&& dataset);
+    void saveOutput(const std::string& folder) const;
 
   private:
     void RecordGenerationToHistory(Generation& gen);

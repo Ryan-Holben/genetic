@@ -1,6 +1,7 @@
 #include <evo/constants.h>
 #include <evo/evo.h>
 
+#include <chrono>
 #include <iostream>
 
 using namespace core;
@@ -43,17 +44,14 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
     // Run through generations, reproducing, evolving, and culling agents until one meets the target
     // fitness score.
     size_t generationIdx = 0;
+    auto startTime = std::chrono::high_resolution_clock::now();
     while (true) {
         std::cout << "\n-------- \x1b[1;32mIteration " << generationIdx << "\x1b[0m --------\n";
         generationIdx++;
-
         ASSERT_WITH_MSG(!currentGen.agents.empty(), "Generation is empty!  Life has ended.");
 
         // Run each agent against a subset of the training set and score it.
         RunAndScoreGeneration(_trainingData, &currentGen);
-        // for (const auto & agent : currentGen.agents) {
-        //     std::cout << agent.score << "\n";
-        // }
 
         // Order the current gen from least to greatest (best to worst) score.
         SortGenerationByScores(&currentGen);
@@ -85,6 +83,9 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         //      been saved to history.
         // * Until SpawnNExtGeneration, there is no currentGen, and accessing that variable gives
         //      undefined behavior.  Instead, we refer to lastGen in the interim.
+        currentGen.duration =
+            std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - startTime)
+                .count();
         RecordGenerationToHistory(currentGen);
         const auto& lastGen = _generations.back();
 
@@ -106,6 +107,7 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         // Let the generation reproduce and create the next generation, introducing random
         // mutations.  This operation will be done in-place on `currentGen`, since we already saved
         // a copy of the previous generation.
+        startTime = std::chrono::high_resolution_clock::now();
         currentGen = SpawnNextGeneration(lastGen);
         std::cout << "Spawned " << currentGen.numChildren << " children, population is "
                   << currentGen.agents.size() << ".\n";
@@ -114,5 +116,35 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
 
 // Makes a COPY of the provided generation
 void Evolver::RecordGenerationToHistory(Generation& gen) { _generations.push_back(std::move(gen)); }
+
+void Evolver::saveOutput(const std::string& folder) const {
+    std::string path = std::getenv("BUILD_WORKSPACE_DIRECTORY");
+    path += +"/" + folder + "/evo.csv";
+
+    // Attempt to open the file for writing
+    std::ofstream outfile;
+    outfile.open(path, std::ofstream::out);
+    if (!outfile) {
+        std::cout << "Couldn't open file for writing: " << path << "\n";
+        std::cout << "Data not saved to disk.\n";
+        return;
+    }
+
+    // Dump the results to disk
+    std::cout << "Writing results to: " << path << "\n";
+    // CSV header
+    outfile << "numAgents, numChildren, numCulled, bestScore, averageScore, worstScore, "
+               "numNewLayers, numNewNeurons, numBiases, numWeights, duration\n";
+
+    // Generation rows
+    for (const auto& g : _generations) {
+        outfile << g.agents.size() << "," << g.numChildren << "," << g.numCulled << ","
+                << g.bestScore << "," << g.averageScore << "," << g.worstScore << ","
+                << g.mutationsNumNewLayers << "," << g.mutationsNumNewNeurons << ","
+                << g.mutationsNumBiasChanges << "," << g.mutationsNumWeightChanges << ","
+                << g.duration << "\n";
+    }
+    outfile.close();
+}
 
 } // namespace evo
