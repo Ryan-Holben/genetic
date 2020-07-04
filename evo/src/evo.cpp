@@ -134,13 +134,15 @@ void Evolver::saveOutput(const std::string& folder) const {
     std::cout << "Writing results to: " << path << "\n";
     // CSV header
     outfile << "numAgents, numChildren, numCulled, bestScore, averageScore, worstScore, "
-               "numNewLayers, numNewNeurons, numBiases, numWeights, duration\n";
+               "bestNumNeurons, worstNumNeurons, numNewLayers, numNewNeurons, numRemovedNeurons, "
+               "numBiases, numWeights, duration\n";
 
     // Generation rows
     for (const auto& g : _generations) {
         outfile << g.agents.size() << "," << g.numChildren << "," << g.numCulled << ","
                 << g.bestScore << "," << g.averageScore << "," << g.worstScore << ","
-                << g.mutationsNumNewLayers << "," << g.mutationsNumNewNeurons << ","
+                << g.bestNumNeurons << "," << g.worstNumNeurons << "," << g.mutationsNumNewLayers
+                << "," << g.mutationsNumNewNeurons << "," << g.mutationsNumRemovedNeurons << ","
                 << g.mutationsNumBiasChanges << "," << g.mutationsNumWeightChanges << ","
                 << g.duration << "\n";
     }

@@ -19,10 +19,9 @@ namespace constants {
 
     namespace mutation {
         namespace chance {
-            static core::Dice NewNeuron(0.20);
-            static core::Dice NewLayer(0.05);
-            // static core::Dice NewNeuron(0.05);
-            // static core::Dice NewNeuron(0.05);
+            static core::Dice RemoveNeuron(0.10);
+            static core::Dice NewNeuron(0.30);
+            static core::Dice NewLayer(0.10);
         }
     }
 

@@ -7,6 +7,8 @@ void ComputeNeuralNetwork(const net::NeuralNetwork& net, const Tuple& input) { n
 
 void AddRandomNeuron(net::NeuralNetwork& net) { net.AddRandomNeuron(); }
 
+void RemoveRandomNeuron(net::NeuralNetwork& net) { net.RemoveRandomNeuron(); }
+
 void AddRandomLayer(net::NeuralNetwork& net) { net.AddRandomLayer(); }
 
 void MutateBiasesAndWeights(net::NeuralNetwork& net) {
@@ -88,6 +90,27 @@ int main(int argc, char* argv[]) {
 
     RUN_BENCH(netBench, AddRandomNeuron, "10x1000x5x3", {
         const auto network = net::BuildRandomNetwork({10, 1000, 5, 3});
+        return std::make_tuple(network);
+    });
+
+    // ********** RemoveRandomNeuron ********** //
+    RUN_BENCH(netBench, RemoveRandomNeuron, "2x5x5x5x3", {
+        const auto network = net::BuildRandomNetwork({2, 5, 5, 5, 3});
+        return std::make_tuple(network);
+    });
+
+    RUN_BENCH(netBench, RemoveRandomNeuron, "2x100x100x100x3", {
+        const auto network = net::BuildRandomNetwork({2, 100, 100, 100, 3});
+        return std::make_tuple(network);
+    });
+
+    RUN_BENCH(netBench, RemoveRandomNeuron, "10x1000x5x3", {
+        const auto network = net::BuildRandomNetwork({10, 1000, 5, 3});
+        return std::make_tuple(network);
+    });
+
+    RUN_BENCH(netBench, RemoveRandomNeuron, "5x1x1x1x5-LayerGetsRemoved", {
+        const auto network = net::BuildRandomNetwork({5, 1, 1, 1, 5});
         return std::make_tuple(network);
     });
 

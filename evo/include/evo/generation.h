@@ -25,15 +25,16 @@ struct Generation {
     // Statistics on mutations across the population
     size_t mutationsNumNewLayers = 0;
     size_t mutationsNumNewNeurons = 0;
+    size_t mutationsNumRemovedNeurons = 0;
     size_t mutationsNumBiasChanges = 0;
     size_t mutationsNumWeightChanges = 0;
 
-    // Runtime statistics
-    double duration = 0.0;
-
-    // Uncategorized
+    // Model complexity
     size_t bestNumNeurons = 0;
     size_t worstNumNeurons = 0;
+
+    // Runtime statistics
+    double duration = 0.0;
 
     void GenerateOnesNetworks(size_t numAgents, const std::vector<size_t>& defaultTopology) {
         agents.clear();

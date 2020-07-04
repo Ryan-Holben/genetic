@@ -68,19 +68,45 @@ TEST(ReLu, basic) {
     EXPECT_EQ(ActivationFunctionReLu(1.0), 1.0);
 }
 
-TEST(NeuralNetwork, doMutations) {
+// TEST(NeuralNetwork, doMutations) {
+//     NeuralNetwork net = BuildOnesNetwork({2, 3, 10, 2});
+//     size_t numBiasMutations = 0;
+//     size_t numWeightMutations = 0;
+
+//     net.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
+//     std::cout << "biases: " << numBiasMutations << "\n";
+//     std::cout << "weights: " << numWeightMutations << "\n";
+// }
+
+TEST(NeuralNetwork, RemoveRandomNeuron) {
     NeuralNetwork net = BuildOnesNetwork({2, 3, 10, 2});
-    size_t numBiasMutations = 0;
-    size_t numWeightMutations = 0;
 
-    net.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
-    std::cout << "biases: " << numBiasMutations << "\n";
-    std::cout << "weights: " << numWeightMutations << "\n";
+    size_t startNumNeurons = net.getNumNeurons();
+    net.RemoveRandomNeuron();
+    ASSERT_EQ(net.getNumNeurons() + 1, startNumNeurons);
 }
 
-TEST(What, theHeck) {
-    auto net = BuildRandomNetwork({2, 5, 5, 5, 3});
-    size_t numBiasMutations = 0;
-    size_t numWeightMutations = 0;
-    net.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
+TEST(NeuralNetwork, RemoveRandomNeuronAndLayer) {
+    NeuralNetwork net = BuildOnesNetwork({2, 1, 1, 2});
+
+    size_t startNumNeurons = net.getNumNeurons();
+    size_t startNumLayers = net.getDepth();
+    net.RemoveRandomNeuron();
+    ASSERT_EQ(net.getNumNeurons() + 1, startNumNeurons);
+    ASSERT_EQ(net.getDepth() + 1, startNumLayers);
 }
+
+TEST(NeuralNetwork, AddRandomNeuron) {
+    NeuralNetwork net = BuildOnesNetwork({2, 3, 10, 2});
+
+    size_t startNumNeurons = net.getNumNeurons();
+    net.AddRandomNeuron();
+    ASSERT_EQ(net.getNumNeurons(), startNumNeurons + 1);
+}
+
+// TEST(What, theHeck) {
+//     auto net = BuildRandomNetwork({2, 5, 5, 5, 3});
+//     size_t numBiasMutations = 0;
+//     size_t numWeightMutations = 0;
+//     net.MutateBiasesAndWeights(&numBiasMutations, &numWeightMutations);
+// }
