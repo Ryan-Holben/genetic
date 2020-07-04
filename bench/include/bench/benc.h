@@ -97,8 +97,8 @@ class Benchmarker {
             bench.numIterations++;
             bench.totalDuration += bench.times.back();
 
-            // Stop when 1000 runs happen, OR if it's taking too long, then at least get 50 runs.
-            if (bench.numIterations >= 1000 ||
+            // Stop when 5000 runs happen, OR if it's taking too long, then at least get 50 runs.
+            if (bench.numIterations >= 5000 ||
                 (bench.totalDuration >= 1.0 && bench.numIterations >= 50)) {
                 break;
             }
