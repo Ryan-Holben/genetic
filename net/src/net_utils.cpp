@@ -10,12 +10,20 @@ namespace net {
 // values.
 NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes) {
     NeuralNetwork net;
-    
+
     for (size_t i = 0; i + 1 < layerSizes.size(); i++) {
         net._layers.push_back(
             Layer(layerSizes[i], {.weights = Tuple(layerSizes[i + 1], 1.0), .bias = 1.0}));
     }
     net._layers.push_back(Layer(layerSizes.back(), {.weights = Tuple(), .bias = 1.0}));
+
+    // Check the results
+    ASSERT(layerSizes.size() == net._layers.size());
+    auto iter = net._layers.begin();
+    for (size_t i = 0; i < layerSizes.size(); i++) {
+        ASSERT(iter->size() == layerSizes[i]);
+        iter++;
+    }
 
     return net;
 }
@@ -39,6 +47,14 @@ NeuralNetwork BuildRandomNetwork(const std::vector<size_t>& layerSizes) {
         net._layers.push_back(std::move(layer));
     }
     net._layers.push_back(Layer(layerSizes.back(), {.weights = Tuple(), .bias = 1.0}));
+
+    // Check the results
+    ASSERT(layerSizes.size() == net._layers.size());
+    auto iter = net._layers.begin();
+    for (size_t i = 0; i < layerSizes.size(); i++) {
+        ASSERT(iter->size() == layerSizes[i]);
+        iter++;
+    }
 
     return net;
 }

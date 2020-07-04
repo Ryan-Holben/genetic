@@ -3,6 +3,8 @@
 #include <core/random.h>
 #include <core/types.h>
 
+#include <list>
+
 using namespace core;
 
 namespace net {
@@ -60,7 +62,7 @@ class NeuralNetwork {
     friend NeuralNetwork BuildRandomNetwork(const std::vector<size_t>& layerSizes);
 
   private:
-    std::vector<Layer> _layers;
+    std::list<Layer> _layers;
 };
 
 NeuralNetwork BuildOnesNetwork(const std::vector<size_t>& layerSizes);
