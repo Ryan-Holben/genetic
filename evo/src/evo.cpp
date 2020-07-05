@@ -81,7 +81,7 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         // CRITICAL NOTES:
         // * Philosophically, at this point the current generation has stopped changing, and it has
         //      been saved to history.
-        // * Until SpawnNExtGeneration, there is no currentGen, and accessing that variable gives
+        // * Until SpawnNextGeneration, there is no currentGen, and accessing that variable gives
         //      undefined behavior.  Instead, we refer to lastGen in the interim.
         currentGen.duration =
             std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - startTime)
