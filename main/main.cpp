@@ -4,14 +4,12 @@
 
 #include <iostream>
 
-// using namespace core;
-
 int main(int argc, char** argv) {
     core::InstallBacktraceHandler();
 
-    auto dataset = GetMnistTrainingSet(false); // or = GetXorDataset()
+    auto dataset = GetMnistTrainingSet(false); // = GetXorDataset();
     if (dataset.empty()) {
-        std::cout << "MNIST failed somehow!\n";
+        std::cout << "Failed to load dataset!  Exiting.\n";
         return 1;
     }
     std::cout << "Loaded " << dataset.size() << " entries.\n";
@@ -26,16 +24,6 @@ int main(int argc, char** argv) {
                      /* defaultTopology = */ {inputSize, 10, 5, 5, outputSize});
     evo.saveOutput("output");
 
-    // core::NeuralNetwork net;
-    // net.buildOnesNetwork({2, 3, 19, 1});
-    // core::Tuple output = net.compute({-0.5, -0.2});
-    // std::cout << "The output was " << output[0] << "\n";
-
-    // for (const auto& datum : xorDataset) {
-    //     core::Tuple output = net.compute(datum.first);
-    //     std::cout << "Input was [" << datum.first[0] << ", " << datum.first[1] << "], we wanted "
-    //               << datum.second[0] << " and we got " << output[0] << "\n";
-    // }
     std::cout << "\n";
 
     return 0;

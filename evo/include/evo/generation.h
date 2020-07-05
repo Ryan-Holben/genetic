@@ -17,6 +17,11 @@ struct Generation {
     size_t numCulled = 0;
     size_t numLifesavers = 0;
 
+    // Demographics
+    size_t minAge = 0;
+    size_t maxAge = 0;
+    Number meanAge = 0.0;
+
     // Fitness statistics
     Number worstScore = std::numeric_limits<Number>::infinity();
     Number averageScore = std::numeric_limits<Number>::infinity();
@@ -29,7 +34,7 @@ struct Generation {
     size_t mutationsNumBiasChanges = 0;
     size_t mutationsNumWeightChanges = 0;
 
-    // Model complexity
+    // Model complexity statistics
     size_t bestNumNeurons = 0;
     size_t worstNumNeurons = 0;
 
