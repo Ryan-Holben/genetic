@@ -72,12 +72,11 @@ void ComputeGenerationStats(Generation* gen) {
                     "The current generation has no agents!  Yes we could gracefully handle this, "
                     "but this probably has broken the algorithm anyway.");
 
+    // Record some info about the best and worst agents
     const auto bestAgent = gen->agents.front();
     const auto worstAgent = gen->agents.back();
-
     gen->bestScore = bestAgent.score;
     gen->worstScore = worstAgent.score;
-
     gen->bestNumNeurons = bestAgent.brain.getNumNeurons();
     gen->worstNumNeurons = worstAgent.brain.getNumNeurons();
 
@@ -85,11 +84,29 @@ void ComputeGenerationStats(Generation* gen) {
                     "Best & worst scores don't make sense.  bestScore = "
                         << gen->bestScore << ", worstScore = " << gen->worstScore);
 
+    // Average score
     gen->averageScore = 0.0;
     for (const auto& agent : gen->agents) {
         gen->averageScore += agent.score;
     }
     gen->averageScore /= gen->agents.size();
+
+    // Population demographics: min, max, and mean ages
+    if (!gen->agents.empty()) {
+        gen->minAge = std::numeric_limits<size_t>::max();
+        gen->maxAge = 0;
+        gen->meanAge = 0.0;
+        for (const auto& agent : gen->agents) {
+            if (agent.age < gen->minAge) {
+                gen->minAge = agent.age;
+            }
+            if (agent.age > gen->maxAge) {
+                gen->maxAge = agent.age;
+            }
+            gen->meanAge += agent.age;
+        }
+        gen->meanAge /= gen->agents.size();
+    }
 }
 
 // Create a new generation from the last one.  In doing so we introduce random mutations.
@@ -99,6 +116,9 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
     // TODO: Do something about constants::flags::PARENTS_DIE_EACH_GENERATION
     if (!constants::flags::PARENTS_DIE_EACH_GENERATION) {
         newGen.agents.insert(newGen.agents.begin(), lastGen.agents.begin(), lastGen.agents.end());
+        for (auto& agent : newGen.agents) {
+            agent.age++;
+        }
     }
 
     newGen.mutationsNumNewLayers = 0;
@@ -112,10 +132,12 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
         const size_t numChildren =
             GetNumChildren(agent.score, lastGen.bestScore, lastGen.worstScore);
 
-        // 2. Loop through that number; to each, generation a child with mutations
+        // 2. Loop through that number; to each, spawn a child with mutations
         for (size_t i = 0; i < numChildren; i++) {
             // 2-a. Copy the child
             auto child = agent;
+            child.age = 0;
+            child.score = 0.0;
 
             // 2-b. Mutate the child
 

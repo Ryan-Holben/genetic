@@ -69,8 +69,8 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         const auto& best = currentGen.agents[0];
         for (size_t i = 0; i < 5; i++) {
             const auto output = best.brain.compute(_trainingData[i].first);
-            std::cout << "expected: " << _trainingData[i].second[0] << ", got: " << output[0]
-                      << "\n";
+            std::cout << "expected: " << vecToStr(_trainingData[i].second)
+                      << ", got: " << vecToStr(output) << "\n";
             // std::cout << "expected: " << vecToInt(_trainingData[i].second) << ", got: " <<
             // vecToStr(output) << "\n";
         }
@@ -81,7 +81,7 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         // CRITICAL NOTES:
         // * Philosophically, at this point the current generation has stopped changing, and it has
         //      been saved to history.
-        // * Until SpawnNExtGeneration, there is no currentGen, and accessing that variable gives
+        // * Until SpawnNextGeneration, there is no currentGen, and accessing that variable gives
         //      undefined behavior.  Instead, we refer to lastGen in the interim.
         currentGen.duration =
             std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - startTime)
@@ -135,7 +135,7 @@ void Evolver::saveOutput(const std::string& folder) const {
     // CSV header
     outfile << "numAgents, numChildren, numCulled, bestScore, averageScore, worstScore, "
                "bestNumNeurons, worstNumNeurons, numNewLayers, numNewNeurons, numRemovedNeurons, "
-               "numBiases, numWeights, duration\n";
+               "numBiases, numWeights, minAge, maxAge, meanAge, duration\n";
 
     // Generation rows
     for (const auto& g : _generations) {
@@ -144,7 +144,7 @@ void Evolver::saveOutput(const std::string& folder) const {
                 << g.bestNumNeurons << "," << g.worstNumNeurons << "," << g.mutationsNumNewLayers
                 << "," << g.mutationsNumNewNeurons << "," << g.mutationsNumRemovedNeurons << ","
                 << g.mutationsNumBiasChanges << "," << g.mutationsNumWeightChanges << ","
-                << g.duration << "\n";
+                << g.minAge << "," << g.maxAge << "," << g.meanAge << "," << g.duration << "\n";
     }
     outfile.close();
 }
