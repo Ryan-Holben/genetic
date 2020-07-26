@@ -84,10 +84,17 @@ void ComputeGenerationStats(Generation* gen) {
                     "Best & worst scores don't make sense.  bestScore = "
                         << gen->bestScore << ", worstScore = " << gen->worstScore);
 
-    // Average score
     gen->averageScore = 0.0;
     for (const auto& agent : gen->agents) {
+        // Average score
         gen->averageScore += agent.score;
+
+        // How impactful were the various mutations on the survivors?
+        gen->mutationsEffectiveNumNewLayers += agent.numAddLayer;
+        gen->mutationsEffectiveNumNewNeurons += agent.numAddNeuron;
+        gen->mutationsEffectiveNumRemovedNeurons += agent.numRemoveNeuron;
+        gen->mutationsEffectiveNumBiasChanges += agent.numMutateBias;
+        gen->mutationsEffectiveNumWeightChanges += agent.numMutateWeight;
     }
     gen->averageScore /= gen->agents.size();
 
@@ -113,11 +120,16 @@ void ComputeGenerationStats(Generation* gen) {
 Generation SpawnNextGeneration(const Generation& lastGen) {
     Generation newGen;
 
-    // TODO: Do something about constants::flags::PARENTS_DIE_EACH_GENERATION
     if (!constants::flags::PARENTS_DIE_EACH_GENERATION) {
         newGen.agents.insert(newGen.agents.begin(), lastGen.agents.begin(), lastGen.agents.end());
+        // Each of these agents increased in age without seeing any mutation
         for (auto& agent : newGen.agents) {
             agent.age++;
+            agent.numRemoveNeuron = 0;
+            agent.numAddNeuron = 0;
+            agent.numAddLayer = 0;
+            agent.numMutateBias = 0;
+            agent.numMutateWeight = 0;
         }
     }
 
@@ -144,24 +156,28 @@ Generation SpawnNextGeneration(const Generation& lastGen) {
             // Remove a neuron?
             if (constants::mutation::chance::RemoveNeuron.roll()) {
                 agent.brain.RemoveRandomNeuron();
+                agent.numRemoveNeuron++;
                 newGen.mutationsNumRemovedNeurons++;
             }
 
             // Add a new neuron?
             if (constants::mutation::chance::NewNeuron.roll()) {
                 agent.brain.AddRandomNeuron();
+                agent.numAddNeuron++;
                 newGen.mutationsNumNewNeurons++;
             }
 
             // Add a new layer?
             if (constants::mutation::chance::NewLayer.roll()) {
                 agent.brain.AddRandomLayer();
+                agent.numAddLayer++;
                 newGen.mutationsNumNewLayers++;
             }
 
             // Mutate weights and biases
-            agent.brain.MutateBiasesAndWeights(&newGen.mutationsNumBiasChanges,
-                                               &newGen.mutationsNumWeightChanges);
+            agent.brain.MutateBiasesAndWeights(&agent.numMutateBias, &agent.numMutateWeight);
+            newGen.mutationsNumBiasChanges += agent.numMutateBias;
+            newGen.mutationsNumWeightChanges += agent.numMutateWeight;
 
             // 2-c. Push the child to the output
             newGen.agents.push_back(child);

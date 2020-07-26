@@ -61,7 +61,7 @@ void Evolver::runAlgorithm(size_t initialPopulation, size_t maxGenerations, Numb
         std::cout << "Culled " << currentGen.numCulled << " agents, population is "
                   << currentGen.agents.size() << ".\n";
 
-        // Record stats about the best and worst scorers.
+        // Record stats about the survivors taht comprise this generation.
         ComputeGenerationStats(&currentGen);
         std::cout << "\x1b[1;33mScore range: " << currentGen.bestScore << ", "
                   << currentGen.worstScore << "\x1b[0m\n";
@@ -133,18 +133,26 @@ void Evolver::saveOutput(const std::string& folder) const {
     // Dump the results to disk
     std::cout << "Writing results to: " << path << "\n";
     // CSV header
-    outfile << "numAgents, numChildren, numCulled, bestScore, averageScore, worstScore, "
-               "bestNumNeurons, worstNumNeurons, numNewLayers, numNewNeurons, numRemovedNeurons, "
-               "numBiases, numWeights, minAge, maxAge, meanAge, duration\n";
+    outfile
+        << "generation, numAgents, numChildren, numCulled, bestScore, averageScore, worstScore, "
+           "bestNumNeurons, worstNumNeurons, numNewLayers, numNewNeurons, numRemovedNeurons, "
+           "numBiases, numWeights, eNumNewLayers, eNumNewNeurons, eNumRemovedNeurons, "
+           "eNumBiases, eNumWeights, minAge, maxAge, meanAge, duration\n";
 
     // Generation rows
+    size_t generationNum = 0;
     for (const auto& g : _generations) {
-        outfile << g.agents.size() << "," << g.numChildren << "," << g.numCulled << ","
-                << g.bestScore << "," << g.averageScore << "," << g.worstScore << ","
-                << g.bestNumNeurons << "," << g.worstNumNeurons << "," << g.mutationsNumNewLayers
-                << "," << g.mutationsNumNewNeurons << "," << g.mutationsNumRemovedNeurons << ","
-                << g.mutationsNumBiasChanges << "," << g.mutationsNumWeightChanges << ","
-                << g.minAge << "," << g.maxAge << "," << g.meanAge << "," << g.duration << "\n";
+        outfile << generationNum << ", " << g.agents.size() << "," << g.numChildren << ","
+                << g.numCulled << "," << g.bestScore << "," << g.averageScore << "," << g.worstScore
+                << "," << g.bestNumNeurons << "," << g.worstNumNeurons << ","
+                << g.mutationsNumNewLayers << "," << g.mutationsNumNewNeurons << ","
+                << g.mutationsNumRemovedNeurons << "," << g.mutationsNumBiasChanges << ","
+                << g.mutationsNumWeightChanges << "," << g.mutationsEffectiveNumNewLayers << ","
+                << g.mutationsEffectiveNumNewNeurons << "," << g.mutationsEffectiveNumRemovedNeurons
+                << "," << g.mutationsEffectiveNumBiasChanges << ","
+                << g.mutationsEffectiveNumWeightChanges << "," << g.minAge << "," << g.maxAge << ","
+                << g.meanAge << "," << g.duration << "\n";
+        generationNum++;
     }
     outfile.close();
 }

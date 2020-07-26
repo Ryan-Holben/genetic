@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     evo.runAlgorithm(/* initialPopulation = */ 10,
                      /* maxGenerations = */ 50,
                      /* targetScore = */ 0.01,
-                     /* defaultTopology = */ {inputSize, 10, 5, 5, outputSize});
+                     /* defaultTopology = */ {inputSize, 25, 5, outputSize});
     evo.saveOutput("output");
 
     std::cout << "\n";
