@@ -34,6 +34,14 @@ struct Generation {
     size_t mutationsNumBiasChanges = 0;
     size_t mutationsNumWeightChanges = 0;
 
+    // Statistics on mutations across the surviving population-- hopefully should signal which
+    // mutations were most impactful.
+    size_t mutationsEffectiveNumNewLayers = 0;
+    size_t mutationsEffectiveNumNewNeurons = 0;
+    size_t mutationsEffectiveNumRemovedNeurons = 0;
+    size_t mutationsEffectiveNumBiasChanges = 0;
+    size_t mutationsEffectiveNumWeightChanges = 0;
+
     // Model complexity statistics
     size_t bestNumNeurons = 0;
     size_t worstNumNeurons = 0;
